@@ -41,16 +41,16 @@ const MobileNavbar: React.FC = () => {
       </header>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t border-text pb-safe">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-around">
+      <nav className="fixed bottom-4 left-4 right-4 z-40">
+        <div className="bg-white border-2 border-text rounded-2xl shadow-[4px_4px_0px_0px_rgba(16,48,69,1)] overflow-hidden backdrop-blur-sm">
+          <div className="flex items-center justify-around relative py-2">
             <NavLink to="/" active={isActive('/')} icon={<Home size={20} />} label="Home" />
             <NavLink to="/explore" active={isActive('/explore')} icon={<Compass size={20} />} label="Explore" />
             <NavLink 
               to="/create" 
               active={isActive('/create')} 
               icon={
-                <div className="bg-secondary p-3 rounded-xl border border-text -mt-6 shadow-[2px_2px_0px_0px_rgba(16,48,69,1)]">
+                <div className="bg-secondary p-3 rounded-xl border border-text shadow-[2px_2px_0px_0px_rgba(16,48,69,1)]">
                   <Plus size={24} />
                 </div>
               } 
@@ -64,7 +64,7 @@ const MobileNavbar: React.FC = () => {
 
       {/* Content Padding */}
       <div className="h-[48px]" /> {/* Top spacing */}
-      <div className="h-[64px]" /> {/* Bottom spacing */}
+      <div className="h-[80px]" /> {/* Bottom spacing */}
     </>
   );
 };
