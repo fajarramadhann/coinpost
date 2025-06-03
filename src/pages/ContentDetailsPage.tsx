@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 import { CONTENT, CREATORS } from '../data/mockData';
 import PriceChart from '../components/charts/PriceChart';
 import { useAlert } from '../context/AlertContext';
@@ -21,7 +21,7 @@ const ContentDetailsPage: React.FC = () => {
   const creator = content ? CREATORS.find(c => c.id === content.creatorId) : null;
 
   if (!content || !creator) {
-    return <div>Content not found</div>;
+    return <div className="p-8 text-center">Content not found</div>;
   }
 
   // Mock price history data
@@ -60,6 +60,8 @@ const ContentDetailsPage: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (!content.type) return null;
+
     switch (content.type) {
       case 'video':
         return (
