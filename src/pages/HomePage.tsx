@@ -6,6 +6,8 @@ import CreatorCard from '../components/creator/CreatorCard';
 import { FEATURED_CREATORS } from '../data/mockData';
 
 const HomePage: React.FC = () => {
+  const isMobile = window.innerWidth < 768;
+
   return (
     <div className="space-y-16">
       {/* Hero Section */}
@@ -44,50 +46,52 @@ const HomePage: React.FC = () => {
             </motion.div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="space-y-4"
-            >
-              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
-                <img 
-                  src="https://images.pexels.com/photos/7130555/pexels-photo-7130555.jpeg" 
-                  alt="Digital Art"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
-                <img 
-                  src="https://images.pexels.com/photos/7130537/pexels-photo-7130537.jpeg" 
-                  alt="Music"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="space-y-4 pt-8"
-            >
-              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
-                <img 
-                  src="https://images.pexels.com/photos/7130560/pexels-photo-7130560.jpeg" 
-                  alt="Photography"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
-                <img 
-                  src="https://images.pexels.com/photos/7130498/pexels-photo-7130498.jpeg" 
-                  alt="Writing"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </motion.div>
-          </div>
+          {!isMobile && (
+            <div className="grid grid-cols-2 gap-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-4"
+              >
+                <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                  <img 
+                    src="https://images.pexels.com/photos/7130555/pexels-photo-7130555.jpeg" 
+                    alt="Digital Art"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                  <img 
+                    src="https://images.pexels.com/photos/7130537/pexels-photo-7130537.jpeg" 
+                    alt="Music"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="space-y-4 pt-8"
+              >
+                <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                  <img 
+                    src="https://images.pexels.com/photos/7130560/pexels-photo-7130560.jpeg" 
+                    alt="Photography"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                  <img 
+                    src="https://images.pexels.com/photos/7130498/pexels-photo-7130498.jpeg" 
+                    alt="Writing"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
       </section>
 
