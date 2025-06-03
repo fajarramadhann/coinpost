@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
 import { CONTENT, CREATORS } from '../data/mockData';
 import PriceChart from '../components/charts/PriceChart';
 import { useAlert } from '../context/AlertContext';
+import { useWallet } from '../context/WalletContext';
 
 const ContentDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { showAlert } = useAlert();
+  const { isConnected, connect } = useWallet();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const content = CONTENT.find(c => c.id === id);
   const creator = content ? CREATORS.find(c => c.id === content.creatorId) : null;
@@ -36,6 +40,83 @@ const ContentDetailsPage: React.FC = () => {
     setIsMuted(!isMuted);
     showAlert('success', isMuted ? 'Unmuted' : 'Muted');
   };
+
+  const handleTransaction = async (type: 'buy' | 'sell') => {
+    if (!isConnected) {
+      showAlert('error', 'Please connect your wallet first');
+      connect();
+      return;
+    }
+    
+    setIsProcessing(true);
+    try {
+      // Simulate transaction
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      showAlert('success', `Successfully ${type === 'buy' ? 'purchased' : 'sold'} ${quantity} ${content.type.toUpperCase()}(s)`);
+      type === 'buy' ? setShowBuyModal(false) : setShowSellModal(false);
+    } catch (error) {
+      showAlert('error', 'Transaction failed. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const TransactionModal = ({ type }: { type: 'buy' | 'sell' }) => (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4 p-4 bg-primary-light rounded-xl border-2 border-text">
+        <img
+          src={content.image}
+          alt={content.title}
+          className="w-16 h-16 rounded-lg border-2 border-text"
+        />
+        <div>
+          <p className="font-bold">{content.type.toUpperCase()}</p>
+          <p className="text-sm">by @{creator.username}</p>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="block font-bold">Quantity</label>
+        <input
+          type="number"
+          min="1"
+          value={quantity}
+          onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value)))}
+          className="input"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex justify-between font-bold">
+          <span>Price per unit</span>
+          <span>{content.price.toFixed(3)} ETH</span>
+        </div>
+        <div className="flex justify-between text-lg font-bold">
+          <span>Total</span>
+          <span>{(content.price * quantity).toFixed(3)} ETH</span>
+        </div>
+      </div>
+
+      <button
+        onClick={() => handleTransaction(type)}
+        disabled={isProcessing}
+        className={`w-full btn ${type === 'buy' ? 'btn-primary' : 'btn-secondary'} text-text relative`}
+      >
+        {isProcessing ? (
+          <span className="flex items-center justify-center">
+            <motion.div
+              className="w-5 h-5 border-2 border-text border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+            <span className="ml-2">Processing...</span>
+          </span>
+        ) : (
+          `Confirm ${type === 'buy' ? 'Purchase' : 'Sale'}`
+        )}
+      </button>
+    </div>
+  );
 
   const renderContent = () => {
     if (!content || !content.type) return null;
@@ -200,12 +281,23 @@ const ContentDetailsPage: React.FC = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full"
+              className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]"
             >
-              <h3 className="text-2xl font-bold mb-4">
+              <button
+                onClick={() => {
+                  setShowBuyModal(false);
+                  setShowSellModal(false);
+                }}
+                className="absolute top-4 right-4"
+              >
+                <X size={24} />
+              </button>
+
+              <h3 className="text-2xl font-bold mb-6">
                 {showBuyModal ? 'Buy' : 'Sell'} {content.title}
               </h3>
-              {/* Modal content would go here */}
+              
+              <TransactionModal type={showBuyModal ? 'buy' : 'sell'} />
             </motion.div>
           </div>
         )}
