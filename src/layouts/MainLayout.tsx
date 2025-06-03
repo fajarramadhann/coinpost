@@ -23,14 +23,14 @@ const MainLayout: React.FC = () => {
       <div className="flex flex-col min-h-screen bg-background">
         {isMobile ? <MobileNavbar /> : <Navbar />}
         
-        <main className="flex-grow">
+        <main className="flex-grow main-content">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="container mx-auto px-3 md:px-4 py-4 md:py-8"
+            className="container mx-auto px-3 md:px-4 py-4 md:py-8 content-safe-area"
           >
             <Outlet />
           </motion.div>
