@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, CreditCard, Clock, Settings, User, ShoppingBag, Heart } from 'lucide-react';
+import { Wallet, CreditCard, Clock, Settings, User, ShoppingBag, Heart, TrendingUp, TrendingDown, Plus } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 import MarketCard from '../components/marketplace/MarketCard';
 import { CONTENT } from '../data/mockData';
@@ -19,6 +19,12 @@ const ProfilePage: React.FC = () => {
   const collectibles = CONTENT.slice(0, 4);
   const created = CONTENT.slice(4, 6);
   const favorites = CONTENT.slice(6, 10);
+
+  const stats = [
+    { label: 'Total Value', value: '12.5 ETH', change: '+15.2%' },
+    { label: 'Items Owned', value: '28', change: '+3' },
+    { label: 'Creators Backed', value: '12', change: '+2' },
+  ];
 
   if (!isConnected) {
     return (
@@ -49,36 +55,53 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <div className="card p-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center border-2 border-text">
-              <User size={24} className="text-text" />
-            </div>
-            <div>
-              <p className="text-sm opacity-70">Wallet Address</p>
-              <h1 className="text-xl font-bold">{address}</h1>
-            </div>
-          </div>
-          
-          <div className="flex gap-4">
-            <div className="bg-primary-light p-4 rounded-xl border-2 border-text">
-              <p className="text-sm opacity-70">Balance</p>
-              <p className="font-bold">{balance}</p>
-            </div>
-            
-            <button className="btn btn-primary text-text h-[fit-content] flex items-center gap-2">
-              <CreditCard size={18} />
-              Add Funds
-            </button>
-            
-            <button className="p-2 rounded-full bg-white border-2 border-text h-[fit-content]">
-              <Settings size={20} />
-            </button>
+      {/* Profile Header */}
+      <div className="relative">
+        <div className="h-32 md:h-48 bg-gradient-to-r from-primary via-secondary to-accent rounded-3xl border-2 border-text"></div>
+        <div className="absolute -bottom-16 left-8 w-32 h-32 rounded-full border-4 border-text bg-white shadow-[4px_4px_0px_0px_rgba(16,48,69,1)]">
+          <div className="w-full h-full rounded-full bg-primary flex items-center justify-center">
+            <User size={48} className="text-text" />
           </div>
         </div>
       </div>
-      
+
+      {/* Profile Info */}
+      <div className="pt-20 md:pt-8 md:pl-44 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{address?.substring(0, 6)}...{address?.substring(address.length - 4)}</h1>
+          <p className="text-sm opacity-70">Joined March 2025</p>
+        </div>
+        
+        <div className="flex gap-3">
+          <button className="btn btn-primary text-text flex items-center gap-2">
+            <CreditCard size={18} />
+            Add Funds
+          </button>
+          <button className="p-2 rounded-full bg-white border-2 border-text">
+            <Settings size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {stats.map((stat, index) => (
+          <div key={index} className="card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-70">{stat.label}</p>
+                <p className="text-2xl font-bold">{stat.value}</p>
+              </div>
+              <div className="flex items-center gap-1 text-success">
+                <TrendingUp size={16} />
+                <span className="text-sm font-bold">{stat.change}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
       <div className="border-b-2 border-text">
         <div className="flex overflow-x-auto space-x-2">
           {tabs.map((tab) => (
@@ -98,6 +121,7 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Tab Content */}
       <div className="min-h-[50vh]">
         {activeTab === 'collected' && (
           <>
@@ -108,12 +132,12 @@ const ProfilePage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <ShoppingBag size={48} className="mx-auto mb-4 text-secondary" />
-                <h3 className="text-2xl font-bold mb-2">No collectibles yet</h3>
-                <p className="text-lg mb-6">Start collecting from your favorite creators</p>
-                <button className="btn btn-primary text-text">Explore Marketplace</button>
-              </div>
+              <EmptyState
+                icon={<ShoppingBag size={48} />}
+                title="No collectibles yet"
+                description="Start collecting from your favorite creators"
+                action={{ label: 'Explore Marketplace', href: '/marketplace' }}
+              />
             )}
           </>
         )}
@@ -121,18 +145,27 @@ const ProfilePage: React.FC = () => {
         {activeTab === 'created' && (
           <>
             {created.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {created.map((item) => (
-                  <MarketCard key={item.id} item={item} />
-                ))}
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold">Your Content</h2>
+                  <button className="btn btn-primary text-text flex items-center gap-2">
+                    <Plus size={18} />
+                    Create New
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {created.map((item) => (
+                    <MarketCard key={item.id} item={item} />
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="text-center py-16">
-                <User size={48} className="mx-auto mb-4 text-secondary" />
-                <h3 className="text-2xl font-bold mb-2">No creations yet</h3>
-                <p className="text-lg mb-6">Start creating and tokenizing your content</p>
-                <button className="btn btn-primary text-text">Create Content</button>
-              </div>
+              <EmptyState
+                icon={<User size={48} />}
+                title="No creations yet"
+                description="Start creating and tokenizing your content"
+                action={{ label: 'Create Content', href: '/create' }}
+              />
             )}
           </>
         )}
@@ -146,34 +179,65 @@ const ProfilePage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <Heart size={48} className="mx-auto mb-4 text-secondary" />
-                <h3 className="text-2xl font-bold mb-2">No favorites yet</h3>
-                <p className="text-lg">Like content to add it to your favorites</p>
-              </div>
+              <EmptyState
+                icon={<Heart size={48} />}
+                title="No favorites yet"
+                description="Like content to add it to your favorites"
+              />
             )}
           </>
         )}
 
         {activeTab === 'activity' && (
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-6">Recent Activity</h2>
-            <div className="space-y-4">
-              <ActivityItem
-                title="Purchased NFT"
-                description="You purchased 'Digital Dreamscape' for 0.5 ETH"
-                time="2 hours ago"
-              />
-              <ActivityItem
-                title="Token Trade"
-                description="You bought 100 $ARTIST tokens"
-                time="1 day ago"
-              />
-              <ActivityItem
-                title="Subscription Started"
-                description="You subscribed to Creator Name"
-                time="3 days ago"
-              />
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="card">
+                <h2 className="text-xl font-bold mb-4">Recent Transactions</h2>
+                <div className="space-y-4">
+                  <ActivityItem
+                    title="Purchased NFT"
+                    description="You purchased 'Digital Dreamscape' for 0.5 ETH"
+                    time="2 hours ago"
+                    type="purchase"
+                  />
+                  <ActivityItem
+                    title="Sold Token"
+                    description="You sold 50 $ARTIST tokens"
+                    time="1 day ago"
+                    type="sale"
+                  />
+                  <ActivityItem
+                    title="Token Trade"
+                    description="You bought 100 $CREATOR tokens"
+                    time="3 days ago"
+                    type="purchase"
+                  />
+                </div>
+              </div>
+
+              <div className="card">
+                <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
+                <div className="space-y-4">
+                  <ActivityItem
+                    title="New Follower"
+                    description="@creator123 started following you"
+                    time="5 hours ago"
+                    type="social"
+                  />
+                  <ActivityItem
+                    title="Content Liked"
+                    description="Your NFT was liked by @collector456"
+                    time="1 day ago"
+                    type="social"
+                  />
+                  <ActivityItem
+                    title="Comment Received"
+                    description="New comment on your latest creation"
+                    time="2 days ago"
+                    type="social"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -182,16 +246,63 @@ const ProfilePage: React.FC = () => {
   );
 };
 
+interface EmptyStateProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  action?: {
+    label: string;
+    href: string;
+  };
+}
+
+const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, description, action }) => {
+  return (
+    <div className="text-center py-16">
+      <div className="inline-block p-4 rounded-full bg-primary-light border-2 border-text mb-4">
+        {icon}
+      </div>
+      <h3 className="text-2xl font-bold mb-2">{title}</h3>
+      <p className="text-lg mb-6">{description}</p>
+      {action && (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="btn btn-primary text-text"
+          onClick={() => window.location.href = action.href}
+        >
+          {action.label}
+        </motion.button>
+      )}
+    </div>
+  );
+};
+
 interface ActivityItemProps {
   title: string;
   description: string;
   time: string;
+  type: 'purchase' | 'sale' | 'social';
 }
 
-const ActivityItem: React.FC<ActivityItemProps> = ({ title, description, time }) => {
+const ActivityItem: React.FC<ActivityItemProps> = ({ title, description, time, type }) => {
+  const getIcon = () => {
+    switch (type) {
+      case 'purchase':
+        return <TrendingUp size={16} className="text-success" />;
+      case 'sale':
+        return <TrendingDown size={16} className="text-error" />;
+      case 'social':
+        return <User size={16} className="text-primary" />;
+    }
+  };
+
   return (
-    <div className="flex justify-between p-4 border-2 border-text rounded-xl hover:bg-primary-light transition-colors">
-      <div>
+    <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-text bg-white hover:bg-primary-light transition-colors">
+      <div className="p-2 rounded-full bg-white border-2 border-text">
+        {getIcon()}
+      </div>
+      <div className="flex-grow">
         <h3 className="font-bold">{title}</h3>
         <p className="text-sm">{description}</p>
       </div>

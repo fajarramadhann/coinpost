@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX, X, TrendingUp, TrendingDown } from 'lucide-react';
 import { CONTENT, CREATORS } from '../data/mockData';
 import PriceChart from '../components/charts/PriceChart';
 import { useAlert } from '../context/AlertContext';
@@ -14,6 +14,7 @@ const ContentDetailsPage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
+  const [showSellModal, setShowSellModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -40,7 +41,7 @@ const ContentDetailsPage: React.FC = () => {
     showAlert('success', isMuted ? 'Unmuted' : 'Muted');
   };
 
-  const handlePurchase = async () => {
+  const handleTransaction = async (type: 'buy' | 'sell') => {
     if (!isConnected) {
       showAlert('error', 'Please connect your wallet first');
       return;
@@ -50,8 +51,8 @@ const ContentDetailsPage: React.FC = () => {
     try {
       // Simulate transaction
       await new Promise(resolve => setTimeout(resolve, 2000));
-      showAlert('success', `Successfully purchased ${quantity} token(s)`);
-      setShowBuyModal(false);
+      showAlert('success', `Successfully ${type === 'buy' ? 'purchased' : 'sold'} ${quantity} token(s)`);
+      type === 'buy' ? setShowBuyModal(false) : setShowSellModal(false);
     } catch (error) {
       showAlert('error', 'Transaction failed. Please try again.');
     } finally {
@@ -144,6 +145,94 @@ const ContentDetailsPage: React.FC = () => {
     }
   };
 
+  const TransactionModal: React.FC<{
+    type: 'buy' | 'sell';
+    onClose: () => void;
+  }> = ({ type, onClose }) => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-text/20 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]"
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4"
+        >
+          <X size={24} />
+        </button>
+
+        <h3 className="text-2xl font-bold mb-4">
+          {type === 'buy' ? 'Buy' : 'Sell'} {content.title}
+        </h3>
+        
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 p-4 bg-primary-light rounded-xl border-2 border-text">
+            <img
+              src={content.image}
+              alt={content.title}
+              className="w-16 h-16 rounded-lg border-2 border-text"
+            />
+            <div>
+              <p className="font-bold">{content.type.toUpperCase()}</p>
+              <p className="text-sm">by @{creator.username}</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block font-bold">Quantity</label>
+            <input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value)))}
+              className="input"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between font-bold">
+              <span>Price per unit</span>
+              <span>{content.price.toFixed(3)} ETH</span>
+            </div>
+            <div className="flex justify-between text-lg font-bold">
+              <span>Total</span>
+              <span>{(content.price * quantity).toFixed(3)} ETH</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => handleTransaction(type)}
+            disabled={isProcessing}
+            className={`w-full btn ${type === 'buy' ? 'btn-primary' : 'btn-secondary'} text-text relative`}
+          >
+            {isProcessing ? (
+              <span className="flex items-center justify-center">
+                <motion.div
+                  className="w-5 h-5 border-2 border-text border-t-transparent rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+                <span className="ml-2">Processing...</span>
+              </span>
+            ) : (
+              `Confirm ${type === 'buy' ? 'Purchase' : 'Sale'}`
+            )}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row gap-8">
@@ -177,21 +266,41 @@ const ContentDetailsPage: React.FC = () => {
             <div className="mt-4 space-y-4">
               <div className="flex justify-between">
                 <span>Current Price</span>
-                <span className="font-bold">{content.price} ETH</span>
+                <div>
+                  <span className="font-bold">{content.price} ETH</span>
+                  <span className="ml-2 text-sm text-success flex items-center gap-1">
+                    <TrendingUp size={14} />
+                    +12.5%
+                  </span>
+                </div>
               </div>
-              <button
-                onClick={() => {
-                  if (!isConnected) {
-                    showAlert('error', 'Please connect your wallet first');
-                    return;
-                  }
-                  setShowBuyModal(true);
-                }}
-                className="w-full btn btn-primary text-text"
-              >
-                <ShoppingCart className="inline-block mr-2" size={20} />
-                Buy Now
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (!isConnected) {
+                      showAlert('error', 'Please connect your wallet first');
+                      return;
+                    }
+                    setShowBuyModal(true);
+                  }}
+                  className="flex-1 btn btn-primary text-text"
+                >
+                  <ShoppingCart className="inline-block mr-2" size={20} />
+                  Buy
+                </button>
+                <button
+                  onClick={() => {
+                    if (!isConnected) {
+                      showAlert('error', 'Please connect your wallet first');
+                      return;
+                    }
+                    setShowSellModal(true);
+                  }}
+                  className="flex-1 btn btn-secondary text-text"
+                >
+                  Sell
+                </button>
+              </div>
             </div>
           </div>
 
@@ -217,88 +326,14 @@ const ContentDetailsPage: React.FC = () => {
         </div>
       </div>
 
-      {showBuyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-text/20 backdrop-blur-sm"
-            onClick={() => setShowBuyModal(false)}
-          />
-          
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]"
-          >
-            <button
-              onClick={() => setShowBuyModal(false)}
-              className="absolute top-4 right-4"
-            >
-              <X size={24} />
-            </button>
-
-            <h3 className="text-2xl font-bold mb-4">Buy {content.title}</h3>
-            
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 bg-primary-light rounded-xl border-2 border-text">
-                <img
-                  src={content.image}
-                  alt={content.title}
-                  className="w-16 h-16 rounded-lg border-2 border-text"
-                />
-                <div>
-                  <p className="font-bold">{content.type.toUpperCase()}</p>
-                  <p className="text-sm">by @{creator.username}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block font-bold">Quantity</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value)))}
-                  className="input"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between font-bold">
-                  <span>Price per unit</span>
-                  <span>{content.price.toFixed(3)} ETH</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span>{(content.price * quantity).toFixed(3)} ETH</span>
-                </div>
-              </div>
-
-              <button
-                onClick={handlePurchase}
-                disabled={isProcessing}
-                className="w-full btn btn-primary text-text relative"
-              >
-                {isProcessing ? (
-                  <span className="flex items-center justify-center">
-                    <motion.div
-                      className="w-5 h-5 border-2 border-text border-t-transparent rounded-full"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    />
-                    <span className="ml-2">Processing...</span>
-                  </span>
-                ) : (
-                  'Confirm Purchase'
-                )}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showBuyModal && (
+          <TransactionModal type="buy" onClose={() => setShowBuyModal(false)} />
+        )}
+        {showSellModal && (
+          <TransactionModal type="sell" onClose={() => setShowSellModal(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
