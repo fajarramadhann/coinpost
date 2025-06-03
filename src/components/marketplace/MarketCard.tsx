@@ -86,15 +86,6 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
     }
   };
 
-  const getItemTypeLabel = (type: string) => {
-    switch (type) {
-      case 'nft': return 'NFT';
-      case 'token': return 'Content Token';
-      case 'creator_token': return 'Creator Token';
-      default: return 'Item';
-    }
-  };
-
   const handleCardClick = () => {
     navigate(`/content/${item.id}`);
   };
@@ -116,26 +107,7 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
             loading="lazy"
           />
           <div className="absolute top-2 right-2 bg-white rounded-full px-2 py-1 text-xs font-bold border-2 border-text">
-            {getItemTypeLabel(item.type)}
-          </div>
-        </div>
-
-        <div className="h-20 bg-primary-light rounded-xl p-2 mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold">Price History</span>
-            <span className="text-sm text-success flex items-center gap-1">
-              <TrendingUp size={14} />
-              +12.5%
-            </span>
-          </div>
-          <div className="flex items-end h-8 gap-1">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex-1 bg-primary rounded-sm"
-                style={{ height: `${Math.random() * 100}%` }}
-              />
-            ))}
+            {item.type.toUpperCase()}
           </div>
         </div>
 
@@ -155,6 +127,10 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
           <div className="flex justify-between items-center pt-3 border-t border-text">
             <div className="font-bold">
               {item.price.toFixed(3)} ETH
+              <span className="ml-2 text-sm text-success flex items-center gap-1">
+                <TrendingUp size={14} />
+                +12.5%
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <button 
@@ -225,7 +201,7 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
                     className="w-16 h-16 rounded-lg border-2 border-text"
                   />
                   <div>
-                    <p className="font-bold">{getItemTypeLabel(item.type)}</p>
+                    <p className="font-bold">{item.type.toUpperCase()}</p>
                     <p className="text-sm">by @{item.creatorUsername}</p>
                   </div>
                 </div>

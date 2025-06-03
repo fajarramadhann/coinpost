@@ -50,27 +50,25 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <div className="relative w-72 h-72 md:w-96 md:h-96">
-              <div className="absolute inset-0 bg-primary rounded-full opacity-20 animate-pulse-slow"></div>
-              <img 
-                src="https://images.pexels.com/photos/7149165/pexels-photo-7149165.jpeg" 
-                alt="Creator with digital art" 
-                className="w-full h-full object-cover rounded-full border-4 border-text"
-              />
-              <motion.div 
-                className="absolute -top-4 -right-4 bg-accent rounded-full p-3 border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)]"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Sparkles size={24} className="text-text" />
-              </motion.div>
-              <motion.div 
-                className="absolute -bottom-4 -left-4 bg-secondary rounded-full p-3 border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)]"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              >
-                <Zap size={24} className="text-text" />
-              </motion.div>
+            <div className="relative p-8 bg-white rounded-3xl border-2 border-text shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  <div className="h-32 bg-primary rounded-xl border-2 border-text flex items-center justify-center">
+                    <Zap size={40} className="text-text" />
+                  </div>
+                  <div className="h-32 bg-secondary rounded-xl border-2 border-text flex items-center justify-center">
+                    <TrendingUp size={40} className="text-text" />
+                  </div>
+                </div>
+                <div className="space-y-4 mt-8">
+                  <div className="h-32 bg-accent rounded-xl border-2 border-text flex items-center justify-center">
+                    <Sparkles size={40} className="text-text" />
+                  </div>
+                  <div className="h-32 bg-primary-light rounded-xl border-2 border-text flex items-center justify-center">
+                    <Users size={40} className="text-text" />
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
