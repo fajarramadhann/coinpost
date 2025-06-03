@@ -328,7 +328,7 @@ const ContentDetailsPage: React.FC = () => {
 
       <AnimatePresence>
         {showBuyModal && (
-          <TransactionModal type="buy" onClose={() => setShowBuyModal(false)} />
+          <TransactionModal type="buy\" onClose={() => setShowBuyModal(false)} />
         )}
         {showSellModal && (
           <TransactionModal type="sell" onClose={() => setShowSellModal(false)} />
