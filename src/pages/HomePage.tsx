@@ -43,34 +43,6 @@ const HomePage: React.FC = () => {
               <Link to="/create" className="btn btn-secondary text-text">Become a Creator</Link>
             </motion.div>
           </div>
-          
-          <motion.div
-            className="flex justify-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <div className="relative p-8 bg-white rounded-3xl border-2 border-text shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="h-32 bg-primary rounded-xl border-2 border-text flex items-center justify-center">
-                    <Zap size={40} className="text-text" />
-                  </div>
-                  <div className="h-32 bg-secondary rounded-xl border-2 border-text flex items-center justify-center">
-                    <TrendingUp size={40} className="text-text" />
-                  </div>
-                </div>
-                <div className="space-y-4 mt-8">
-                  <div className="h-32 bg-accent rounded-xl border-2 border-text flex items-center justify-center">
-                    <Sparkles size={40} className="text-text" />
-                  </div>
-                  <div className="h-32 bg-primary-light rounded-xl border-2 border-text flex items-center justify-center">
-                    <Users size={40} className="text-text" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
