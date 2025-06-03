@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Zap, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { Zap, Sparkles, TrendingUp, Users, Shield, Coins, Rocket, Gift } from 'lucide-react';
 import CreatorCard from '../components/creator/CreatorCard';
 import { FEATURED_CREATORS } from '../data/mockData';
 
@@ -43,7 +43,76 @@ const HomePage: React.FC = () => {
               <Link to="/create" className="btn btn-secondary text-text">Become a Creator</Link>
             </motion.div>
           </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-4"
+            >
+              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                <img 
+                  src="https://images.pexels.com/photos/7130555/pexels-photo-7130555.jpeg" 
+                  alt="Digital Art"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                <img 
+                  src="https://images.pexels.com/photos/7130537/pexels-photo-7130537.jpeg" 
+                  alt="Music"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-4 pt-8"
+            >
+              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                <img 
+                  src="https://images.pexels.com/photos/7130560/pexels-photo-7130560.jpeg" 
+                  alt="Photography"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
+                <img 
+                  src="https://images.pexels.com/photos/7130498/pexels-photo-7130498.jpeg" 
+                  alt="Writing"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
+          </div>
         </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Creators"
+          value="10,000+"
+          icon={<Users size={24} />}
+        />
+        <StatCard
+          title="Content Pieces"
+          value="50,000+"
+          icon={<Gift size={24} />}
+        />
+        <StatCard
+          title="Trading Volume"
+          value="$2M+"
+          icon={<Coins size={24} />}
+        />
+        <StatCard
+          title="Active Users"
+          value="100,000+"
+          icon={<Rocket size={24} />}
+        />
       </section>
 
       {/* Features Section */}
@@ -72,6 +141,45 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Benefits Section */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <h2 className="text-3xl font-bold">Benefits for Creators</h2>
+          <div className="space-y-4">
+            <BenefitItem
+              title="Direct Monetization"
+              description="Earn directly from your content without intermediaries"
+            />
+            <BenefitItem
+              title="Community Ownership"
+              description="Give your fans a stake in your success"
+            />
+            <BenefitItem
+              title="Creative Freedom"
+              description="Focus on creating while we handle the technology"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-8">
+          <h2 className="text-3xl font-bold">Benefits for Fans</h2>
+          <div className="space-y-4">
+            <BenefitItem
+              title="Early Access"
+              description="Get exclusive access to new content and features"
+            />
+            <BenefitItem
+              title="Value Growth"
+              description="Benefit from creator's success as token holder"
+            />
+            <BenefitItem
+              title="Direct Support"
+              description="Support creators you love in a meaningful way"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Featured Creators */}
       <section>
         <div className="flex justify-between items-center mb-8">
@@ -83,6 +191,40 @@ const HomePage: React.FC = () => {
           {FEATURED_CREATORS.map((creator) => (
             <CreatorCard key={creator.id} creator={creator} />
           ))}
+        </div>
+      </section>
+
+      {/* Security Section */}
+      <section className="bg-primary-light rounded-3xl border-2 border-text p-8 md:p-12">
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="md:w-1/2 space-y-6">
+            <Shield size={48} className="text-text" />
+            <h2 className="text-3xl font-bold">Secure & Transparent</h2>
+            <p className="text-lg">
+              Your content and tokens are secured by blockchain technology. Every transaction is transparent and verifiable.
+            </p>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <Sparkles size={20} className="text-accent" />
+                <span>Smart contract audited</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Sparkles size={20} className="text-accent" />
+                <span>Multi-signature wallets</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Sparkles size={20} className="text-accent" />
+                <span>Regular security updates</span>
+              </li>
+            </ul>
+          </div>
+          <div className="md:w-1/2">
+            <img 
+              src="https://images.pexels.com/photos/8370752/pexels-photo-8370752.jpeg"
+              alt="Security"
+              className="w-full rounded-xl border-2 border-text"
+            />
+          </div>
         </div>
       </section>
 
@@ -116,6 +258,50 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
       <h3 className="text-xl font-bold mb-2">{title}</h3>
       <p>{description}</p>
     </motion.div>
+  );
+};
+
+interface StatCardProps {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => {
+  return (
+    <motion.div
+      className="card"
+      whileHover={{ y: -5 }}
+    >
+      <div className="flex items-center gap-4">
+        <div className="bg-primary-light rounded-full p-3 border-2 border-text">
+          {icon}
+        </div>
+        <div>
+          <h3 className="text-2xl font-bold">{value}</h3>
+          <p className="text-sm">{title}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+interface BenefitItemProps {
+  title: string;
+  description: string;
+}
+
+const BenefitItem: React.FC<BenefitItemProps> = ({ title, description }) => {
+  return (
+    <div className="flex items-start gap-4 p-4 rounded-xl border-2 border-text bg-white">
+      <div className="bg-primary-light rounded-full p-2 border-2 border-text">
+        <Sparkles size={20} className="text-text" />
+      </div>
+      <div>
+        <h3 className="font-bold mb-1">{title}</h3>
+        <p className="text-sm">{description}</p>
+      </div>
+    </div>
   );
 };
 
