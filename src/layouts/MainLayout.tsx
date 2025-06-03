@@ -41,5 +41,3 @@ const MainLayout: React.FC = () => {
     </LazyMotion>
   );
 };
-
-export default MainLayout;
