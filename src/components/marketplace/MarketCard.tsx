@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ShoppingCart, Share2, X, TrendingUp, TrendingDown } from 'lucide-react';
 import { useWallet } from '../../context/WalletContext';
 import { useAlert } from '../../context/AlertContext';
+import { useNavigate } from 'react-router-dom';
 
 interface MarketItem {
   id: string;
@@ -25,6 +26,7 @@ interface MarketCardProps {
 }
 
 const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
+  const navigate = useNavigate();
   const { isConnected } = useWallet();
   const { showAlert } = useAlert();
   const [liked, setLiked] = useState(false);
@@ -50,7 +52,9 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
     setLiked(!liked);
   };
 
-  const handleShare = async () => {
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     try {
       await navigator.share({
         title: item.title,
@@ -91,13 +95,18 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
     }
   };
 
+  const handleCardClick = () => {
+    navigate(`/content/${item.id}`);
+  };
+
   const totalPrice = item.price * quantity;
 
   return (
     <>
       <motion.div
-        className="card hover:translate-y-[-5px] transition-transform duration-300"
+        className="card hover:translate-y-[-5px] transition-transform duration-300 cursor-pointer"
         whileHover={{ y: -5 }}
+        onClick={handleCardClick}
       >
         <div className="relative mb-4">
           <img
@@ -158,13 +167,21 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
                 />
               </button>
               <button
-                onClick={() => handleShare()}
+                onClick={handleShare}
                 className="p-2 rounded-full bg-white border-2 border-text"
               >
                 <Share2 size={16} />
               </button>
               <button 
-                onClick={() => setShowBuyModal(true)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (!isConnected) {
+                    showAlert('error', 'Please connect your wallet first');
+                    return;
+                  }
+                  setShowBuyModal(true);
+                }}
                 className="p-2 rounded-full bg-primary border-2 border-text"
               >
                 <ShoppingCart size={16} className="text-text" />
