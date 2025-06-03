@@ -20,8 +20,8 @@ import { AlertProvider } from './context/AlertContext';
 
 function App() {
   return (
-    <WalletProvider>
-      <AlertProvider>
+    <AlertProvider>
+      <WalletProvider>
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<MainLayout />}>
@@ -35,8 +35,8 @@ function App() {
             </Route>
           </Routes>
         </AnimatePresence>
-      </AlertProvider>
-    </WalletProvider>
+      </WalletProvider>
+    </AlertProvider>
   );
 }
 
