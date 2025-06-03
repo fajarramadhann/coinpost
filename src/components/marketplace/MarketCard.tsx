@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ShoppingCart, Share2, X, TrendingUp, TrendingDown } from 'lucide-react';
+import { Heart, ShoppingCart, Share2, X, TrendingUp } from 'lucide-react';
 import { useWallet } from '../../context/WalletContext';
 import { useAlert } from '../../context/AlertContext';
 import { useNavigate } from 'react-router-dom';
@@ -89,8 +89,6 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
   const handleCardClick = () => {
     navigate(`/content/${item.id}`);
   };
-
-  const totalPrice = item.price * quantity;
 
   return (
     <>
@@ -224,7 +222,7 @@ const MarketCard: React.FC<MarketCardProps> = ({ item }) => {
                   </div>
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>{totalPrice.toFixed(3)} ETH</span>
+                    <span>{(item.price * quantity).toFixed(3)} ETH</span>
                   </div>
                 </div>
 
