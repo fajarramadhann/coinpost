@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <Zap size={28} className="text-text" />
-            <span className="text-2xl font-display font-bold">TokenizeMe</span>
+            <span className="text-2xl font-display font-bold">KREA</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">

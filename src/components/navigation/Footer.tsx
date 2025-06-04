@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Zap size={24} className="text-text" />
-              <span className="text-xl font-display font-bold">TokenizeMe</span>
+              <span className="text-xl font-display font-bold">KREA</span>
             </Link>
             <p className="text-text mb-4">
               Turn your content into tradeable tokens. A platform for creators to tokenize and monetize their content.
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
 
         <div className="mt-8 pt-6 border-t-2 border-text">
           <p className="text-center text-text">
-            &copy; {new Date().getFullYear()} TokenizeMe. All rights reserved.
+            &copy; {new Date().getFullYear()} KREA. All rights reserved.
           </p>
         </div>
       </div>

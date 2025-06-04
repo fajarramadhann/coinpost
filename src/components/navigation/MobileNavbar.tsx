@@ -20,7 +20,7 @@ const MobileNavbar: React.FC = () => {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
               <Zap size={20} className="text-text" />
-              <span className="text-lg font-display font-bold">TokenizeMe</span>
+              <span className="text-lg font-display font-bold">KREA</span>
             </Link>
 
             {isConnected ? (
