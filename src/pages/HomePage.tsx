@@ -58,14 +58,14 @@ const HomePage: React.FC = () => {
                   <img 
                     src="https://images.pexels.com/photos/7130555/pexels-photo-7130555.jpeg" 
                     alt="Digital Art"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
                   <img 
                     src="https://images.pexels.com/photos/7130537/pexels-photo-7130537.jpeg" 
                     alt="Music"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               </motion.div>
@@ -79,14 +79,14 @@ const HomePage: React.FC = () => {
                   <img 
                     src="https://images.pexels.com/photos/7130560/pexels-photo-7130560.jpeg" 
                     alt="Photography"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="aspect-square rounded-2xl border-2 border-text overflow-hidden">
                   <img 
                     src="https://images.pexels.com/photos/7130498/pexels-photo-7130498.jpeg" 
                     alt="Writing"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               </motion.div>
@@ -96,35 +96,47 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="grid grid-cols-2 gap-4">
-        <div className="card p-4 md:p-6">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div 
+          className="card p-4 md:p-6"
+          whileHover={{ y: -5 }}
+        >
           <div className="flex flex-col items-center text-center">
             <Users className="w-8 h-8 mb-2 text-primary" />
-            <div className="text-2xl md:text-3xl font-bold">10,000+</div>
+            <div className="text-xl md:text-3xl font-bold">10,000+</div>
             <div className="text-sm">Creators</div>
           </div>
-        </div>
-        <div className="card p-4 md:p-6">
+        </motion.div>
+        <motion.div 
+          className="card p-4 md:p-6"
+          whileHover={{ y: -5 }}
+        >
           <div className="flex flex-col items-center text-center">
             <Gift className="w-8 h-8 mb-2 text-secondary" />
-            <div className="text-2xl md:text-3xl font-bold">50,000+</div>
+            <div className="text-xl md:text-3xl font-bold">50,000+</div>
             <div className="text-sm">Content</div>
           </div>
-        </div>
-        <div className="card p-4 md:p-6">
+        </motion.div>
+        <motion.div 
+          className="card p-4 md:p-6"
+          whileHover={{ y: -5 }}
+        >
           <div className="flex flex-col items-center text-center">
             <Coins className="w-8 h-8 mb-2 text-accent" />
-            <div className="text-2xl md:text-3xl font-bold">$2M+</div>
+            <div className="text-xl md:text-3xl font-bold">$2M+</div>
             <div className="text-sm">Volume</div>
           </div>
-        </div>
-        <div className="card p-4 md:p-6">
+        </motion.div>
+        <motion.div 
+          className="card p-4 md:p-6"
+          whileHover={{ y: -5 }}
+        >
           <div className="flex flex-col items-center text-center">
             <Rocket className="w-8 h-8 mb-2 text-success" />
-            <div className="text-2xl md:text-3xl font-bold">100,000+</div>
+            <div className="text-xl md:text-3xl font-bold">100,000+</div>
             <div className="text-sm">Users</div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Features Section */}
@@ -269,31 +281,6 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
       </div>
       <h3 className="text-xl font-bold mb-2">{title}</h3>
       <p>{description}</p>
-    </motion.div>
-  );
-};
-
-interface StatCardProps {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => {
-  return (
-    <motion.div
-      className="card"
-      whileHover={{ y: -5 }}
-    >
-      <div className="flex items-center gap-4">
-        <div className="bg-primary-light rounded-full p-3 border-2 border-text">
-          {icon}
-        </div>
-        <div>
-          <h3 className="text-2xl font-bold">{value}</h3>
-          <p className="text-sm">{title}</p>
-        </div>
-      </div>
     </motion.div>
   );
 };
