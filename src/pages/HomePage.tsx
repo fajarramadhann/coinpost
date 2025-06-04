@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
     <div className="space-y-16">
       {/* Hero Section */}
       <section className="relative">
-        <div className="absolute -z-10 top-0 left-0 w-full h-full bg-gradient-to-br from-primary-light via-background to-secondary/20 rounded-3xl"></div>
+        <div className="absolute -z-10 top-10 left-0 w-full h-full bg-gradient-to-br from-primary-light via-background to-secondary/20 rounded-3xl"></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-8 md:py-16 px-4 md:px-8 rounded-3xl border-2 border-text shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-4">
