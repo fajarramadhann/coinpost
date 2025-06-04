@@ -113,19 +113,29 @@ const ProfilePage: React.FC = () => {
         </div>
         
         <div className="flex gap-3">
-          <button 
+          <motion.button 
             onClick={() => setShowAddFundsModal(true)}
             className="btn btn-primary text-text flex items-center gap-2"
+            whileHover={{ 
+              scale: 1.05,
+              transition: { type: "spring", stiffness: 400, damping: 15 }
+            }}
+            whileTap={{ scale: 0.95 }}
           >
             <CreditCard size={18} />
             Add Funds
-          </button>
-          <button 
+          </motion.button>
+          <motion.button 
             onClick={() => setShowSettingsModal(true)}
-            className="p-2 rounded-full bg-white border-2 border-text"
+            className="p-2 rounded-full bg-white border-2 border-text hover:shadow-[2px_2px_0px_0px_rgba(16,48,69,1)] hover:-translate-y-0.5 transition-all duration-200"
+            whileHover={{ 
+              scale: 1.05,
+              transition: { type: "spring", stiffness: 400, damping: 15 }
+            }}
+            whileTap={{ scale: 0.95 }}
           >
             <Settings size={20} />
-          </button>
+          </motion.button>
         </div>
       </div>
 
