@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 // Layouts
@@ -26,10 +26,10 @@ function App() {
           <Routes>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<HomePage />} />
+              <Route path="marketplace" element={<MarketplacePage />} />
               <Route path="explore" element={<ExplorePage />} />
               <Route path="creator/:id" element={<CreatorPage />} />
               <Route path="profile" element={<ProfilePage />} />
-              <Route path="marketplace" element={<MarketplacePage />} />
               <Route path="create" element={<CreateContentPage />} />
               <Route path="content/:id" element={<ContentDetailsPage />} />
             </Route>

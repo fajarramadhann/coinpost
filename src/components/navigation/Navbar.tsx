@@ -22,14 +22,13 @@ const Navbar: React.FC = () => {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            <NavLink to="/" active={isActive('/')}>Home</NavLink>
+            <NavLink to="/marketplace" active={isActive('/marketplace')}>
+              <ShoppingBag size={18} />
+              Feed
+            </NavLink>
             <NavLink to="/explore" active={isActive('/explore')}>
               <Compass size={18} />
               Explore
-            </NavLink>
-            <NavLink to="/marketplace" active={isActive('/marketplace')}>
-              <ShoppingBag size={18} />
-              Marketplace
             </NavLink>
             <NavLink to="/profile" active={isActive('/profile')}>
               <User size={18} />
