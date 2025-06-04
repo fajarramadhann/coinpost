@@ -19,7 +19,6 @@ const MarketplacePage: React.FC = () => {
   const observerRef = useRef<IntersectionObserver>();
   const loadingRef = useRef<HTMLDivElement>(null);
 
-  // Create merged content with creator info
   const feedItems = CONTENT.map(content => {
     const creator = CREATORS.find(c => c.id === content.creatorId);
     return {
@@ -54,7 +53,6 @@ const MarketplacePage: React.FC = () => {
   const loadMoreContent = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       setPage(prev => prev + 1);
       if (page >= 3) setHasMore(false);
@@ -91,10 +89,15 @@ const MarketplacePage: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl border-2 border-text p-4 space-y-4"
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="bg-white rounded-xl border-2 border-text p-4 space-y-4 hover:shadow-[4px_4px_0px_0px_rgba(16,48,69,1)] hover:-translate-y-0.5 transition-all duration-200"
       >
-        {/* Creator Info */}
-        <div className="flex items-center gap-3">
+        <motion.div 
+          className="flex items-center gap-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
           <img
             src={item.creatorAvatar}
             alt={item.creatorName}
@@ -104,21 +107,30 @@ const MarketplacePage: React.FC = () => {
             <h3 className="font-bold">{item.creatorName}</h3>
             <p className="text-sm opacity-70">@{item.creatorUsername}</p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Content */}
         <div onClick={handleContentClick} className="cursor-pointer">
           <h2 className="text-xl font-bold mb-2">{item.title}</h2>
-          <p className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}>
-            {item.description}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.p 
+              key={isExpanded ? 'expanded' : 'collapsed'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}
+            >
+              {item.description}
+            </motion.p>
+          </AnimatePresence>
           {item.description.length > 150 && (
-            <button
+            <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsExpanded(!isExpanded);
               }}
-              className="text-primary font-bold mt-2 flex items-center gap-1"
+              className="text-primary font-bold mt-2 flex items-center gap-1 hover:text-primary-dark transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {isExpanded ? (
                 <>
@@ -131,12 +143,16 @@ const MarketplacePage: React.FC = () => {
                   <ChevronDown size={16} />
                 </>
               )}
-            </button>
+            </motion.button>
           )}
         </div>
 
-        {/* Image */}
-        <div className="relative" onClick={handleContentClick}>
+        <motion.div 
+          className="relative"
+          onClick={handleContentClick}
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
           <img
             src={item.image}
             alt={item.title}
@@ -145,19 +161,23 @@ const MarketplacePage: React.FC = () => {
             }`}
           />
           {item.isLocked && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div 
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               <div className="bg-white/90 p-4 rounded-xl border-2 border-text flex items-center gap-2">
                 <Lock size={20} />
                 <span className="font-bold">Premium Content</span>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
-        {/* Actions */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-4">
-            <button
+            <motion.button
               onClick={() => {
                 if (!isConnected) {
                   showAlert('error', 'Please connect your wallet first');
@@ -167,44 +187,53 @@ const MarketplacePage: React.FC = () => {
                 setLikes(liked ? likes - 1 : likes + 1);
               }}
               className="flex items-center gap-2 hover:text-primary transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               <motion.div
-                whileTap={{ scale: 0.9 }}
                 className={`p-2 rounded-full ${
                   liked ? 'bg-primary/20' : 'hover:bg-primary/10'
                 }`}
+                animate={{ scale: liked ? [1, 1.2, 1] : 1 }}
+                transition={{ duration: 0.3 }}
               >
                 <TrendingUp size={20} className={liked ? 'text-primary' : ''} />
               </motion.div>
               <span>{likes}</span>
-            </button>
-            <button className="flex items-center gap-2 hover:text-primary transition-colors">
+            </motion.button>
+            <motion.button 
+              className="flex items-center gap-2 hover:text-primary transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
               <motion.div
-                whileTap={{ scale: 0.9 }}
                 className="p-2 rounded-full hover:bg-primary/10"
               >
                 <MessageCircle size={20} />
               </motion.div>
               <span>{item.comments}</span>
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={() => handleShare(item)}
               className="hover:text-primary transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               <motion.div
-                whileTap={{ scale: 0.9 }}
                 className="p-2 rounded-full hover:bg-primary/10"
               >
                 <Share2 size={20} />
               </motion.div>
-            </button>
+            </motion.button>
           </div>
-          <button 
+          <motion.button 
             onClick={handleContentClick}
             className="px-4 py-2 rounded-full bg-primary border-2 border-text font-bold hover:bg-primary-dark transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {item.price.toFixed(3)} ETH
-          </button>
+          </motion.button>
         </div>
       </motion.div>
     );
@@ -212,8 +241,12 @@ const MarketplacePage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* Search */}
-      <div className="sticky top-0 z-10 bg-background pt-4 pb-2">
+      <motion.div 
+        className="sticky top-0 z-10 bg-background pt-4 pb-2"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      >
         <div className="relative">
           <Search className="absolute top-3 left-3 text-text" size={20} />
           <input
@@ -225,10 +258,14 @@ const MarketplacePage: React.FC = () => {
           />
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
-          {['trending', 'latest', 'following', 'popular'].map((filter) => (
-            <button
+        <motion.div 
+          className="flex gap-2 mt-4 overflow-x-auto pb-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          {['trending', 'latest', 'following', 'popular'].map((filter, index) => (
+            <motion.button
               key={filter}
               onClick={() => setActiveFilter(filter)}
               className={`px-4 py-2 rounded-full border-2 border-text font-bold whitespace-nowrap ${
@@ -236,33 +273,51 @@ const MarketplacePage: React.FC = () => {
                   ? 'bg-primary'
                   : 'bg-white hover:bg-primary-light'
               }`}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {filter.charAt(0).toUpperCase() + filter.slice(1)}
-            </button>
+            </motion.button>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {/* Feed */}
-      <div className="space-y-6">
-        {feedItems.map((item) => (
-          <FeedItem key={item.id} item={item} />
+      <motion.div 
+        className="space-y-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        {feedItems.map((item, index) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <FeedItem item={item} />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      {/* Loading */}
       {isLoading && (
-        <div className="flex justify-center py-4">
+        <motion.div 
+          className="flex justify-center py-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           >
             <ScrollText size={24} />
           </motion.div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Observer Element */}
       <div ref={loadingRef} className="h-4" />
     </div>
   );
