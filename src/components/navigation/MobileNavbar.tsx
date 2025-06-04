@@ -56,7 +56,7 @@ const MobileNavbar: React.FC = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-secondary p-4 rounded-xl border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)] hover:bg-secondary/90 transition-colors"
+                  className="bg-secondary p-4 rounded-xl border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)] hover:shadow-[2px_2px_0px_0px_rgba(16,48,69,1)] hover:-translate-y-0.5 transition-all duration-200"
                 >
                   <Plus size={24} className="text-text" />
                 </motion.div>
