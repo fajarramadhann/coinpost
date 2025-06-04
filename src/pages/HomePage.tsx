@@ -1,11 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Zap, Sparkles, TrendingUp, Users, Shield, Coins, Rocket, Gift } from 'lucide-react';
-import CreatorCard from '../components/creator/CreatorCard';
-import { FEATURED_CREATORS } from '../data/mockData';
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const isMobile = window.innerWidth < 768;
 
   return (
@@ -15,6 +14,10 @@ const HomePage: React.FC = () => {
         <div className="absolute -z-10 top-0 left-0 w-full h-full bg-gradient-to-br from-primary-light via-background to-secondary/20 rounded-3xl"></div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-8 md:py-16 px-4 md:px-8 rounded-3xl border-2 border-text shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
           <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap size={28} className="text-text" />
+              <span className="text-2xl font-display font-bold">KREA</span>
+            </div>
             <motion.h1 
               className="text-4xl md:text-6xl font-display font-bold leading-tight"
               initial={{ opacity: 0, y: 20 }}
@@ -23,7 +26,7 @@ const HomePage: React.FC = () => {
             >
               Turn Your Content
               <br />
-              <span className="text-shadow bg-primary text-text">
+              <span className="text-shadow text-primary">
                 Into Capital
               </span>
             </motion.h1>
@@ -41,8 +44,18 @@ const HomePage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <Link to="/explore" className="btn btn-primary text-text">Start Exploring</Link>
-              <Link to="/create" className="btn btn-secondary text-text">Become a Creator</Link>
+              <button 
+                onClick={() => navigate('/marketplace')} 
+                className="btn btn-primary text-text"
+              >
+                Start Exploring
+              </button>
+              <button 
+                onClick={() => navigate('/create')} 
+                className="btn btn-secondary text-text"
+              >
+                Become a Creator
+              </button>
             </motion.div>
           </div>
           
@@ -204,20 +217,6 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Creators */}
-      <section>
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Featured Creators</h2>
-          <Link to="/explore" className="text-text font-bold underline">View All</Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FEATURED_CREATORS.map((creator) => (
-            <CreatorCard key={creator.id} creator={creator} />
-          ))}
-        </div>
-      </section>
-
       {/* Security Section */}
       <section className="bg-primary-light rounded-3xl border-2 border-text p-8 md:p-12">
         <div className="flex flex-col md:flex-row items-center gap-8">
@@ -258,7 +257,12 @@ const HomePage: React.FC = () => {
         <p className="text-lg mb-8 max-w-2xl mx-auto">
           Join thousands of creators who are already turning their content into capital
         </p>
-        <Link to="/create" className="btn btn-primary text-text">Get Started</Link>
+        <button 
+          onClick={() => navigate('/create')} 
+          className="btn btn-primary text-text"
+        >
+          Get Started
+        </button>
       </section>
     </div>
   );

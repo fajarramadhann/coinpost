@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useWallet } from '../../context/WalletContext';
-import { Zap, Compass, ShoppingBag, User, Plus } from 'lucide-react';
+import { Zap, Compass, ScrollText, User, Plus } from 'lucide-react';
 
 const MobileNavbar: React.FC = () => {
   const location = useLocation();
@@ -44,7 +44,7 @@ const MobileNavbar: React.FC = () => {
       <nav className="fixed bottom-4 left-4 right-4 z-40">
         <div className="bg-white/95 backdrop-blur-sm border-2 border-text rounded-2xl shadow-[4px_4px_0px_0px_rgba(16,48,69,1)] overflow-hidden">
           <div className="flex items-center justify-around relative py-2">
-            <NavLink to="/marketplace" active={isActive('/marketplace')} icon={<ShoppingBag size={24} />} label="Feed" />
+            <NavLink to="/marketplace" active={isActive('/marketplace')} icon={<ScrollText size={24} />} label="Feed" />
             <NavLink to="/explore" active={isActive('/explore')} icon={<Compass size={24} />} label="Explore" />
             
             {/* Create Button */}
@@ -56,7 +56,7 @@ const MobileNavbar: React.FC = () => {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-secondary p-4 rounded-xl border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)]"
+                  className="bg-secondary p-4 rounded-xl border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)] hover:bg-secondary/90 transition-colors"
                 >
                   <Plus size={24} className="text-text" />
                 </motion.div>
