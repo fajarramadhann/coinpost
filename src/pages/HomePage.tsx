@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
             >
               Turn Your Content
               <br />
-              <span className="text-shadow bg-gradient-to-r from-[#AEC6CF] to-[#FFB7C5] bg-clip-text text-transparent">
+              <span className="text-shadow bg-primary text-text">
                 Into Capital
               </span>
             </motion.h1>
