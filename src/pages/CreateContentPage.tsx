@@ -4,7 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Upload, Image, Video, Music, FileText, AlertCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Upload, Image, Video, Music, FileText, AlertCircle, X, ChevronLeft, ChevronRight, Loader } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 import { useAlert } from '../context/AlertContext';
 import RichTextEditor from '../components/create/RichTextEditor';
@@ -96,10 +96,10 @@ const CreateContentPage: React.FC = () => {
     try {
       // Simulate token creation
       await new Promise(resolve => setTimeout(resolve, 2000));
-      showAlert('success', 'Content tokenized successfully!');
+      showAlert('success', 'Content tokenized successfully! Your content is now live.');
       // Reset and redirect
     } catch (error) {
-      showAlert('error', 'Failed to tokenize content');
+      showAlert('error', 'Failed to tokenize content. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -332,7 +332,24 @@ const CreateContentPage: React.FC = () => {
             </div>
 
             <div className="card">
-              <TokenizationForm onSubmit={handleTokenization} />
+              <TokenizationForm 
+                onSubmit={handleTokenization} 
+                isProcessing={isProcessing}
+              />
+              
+              {isProcessing && (
+                <div className="fixed inset-0 bg-text/20 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl p-6 border-2 border-text shadow-lg flex items-center gap-4">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Loader size={24} />
+                    </motion.div>
+                    <p className="font-bold">Launching your content...</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
