@@ -24,7 +24,7 @@ const MainLayout: React.FC = () => {
       <div className="flex flex-col min-h-screen bg-background">
         {isMobile ? (isLandingPage ? null : <MobileNavbar />) : <Navbar />}
         
-        <main className="flex-grow main-content">
+        <main className={`flex-grow ${isLandingPage ? '' : 'pt-2'}`}>
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0 }}
