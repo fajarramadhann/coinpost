@@ -2,7 +2,8 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Info } from 'lucide-react';
+import { Info, Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const tokenizationSchema = z.object({
   initialSupply: z.number()
@@ -26,9 +27,10 @@ type TokenizationFormData = z.infer<typeof tokenizationSchema>;
 
 interface TokenizationFormProps {
   onSubmit: (data: TokenizationFormData) => void;
+  isProcessing?: boolean;
 }
 
-const TokenizationForm: React.FC<TokenizationFormProps> = ({ onSubmit }) => {
+const TokenizationForm: React.FC<TokenizationFormProps> = ({ onSubmit, isProcessing }) => {
   const { register, handleSubmit, formState: { errors } } = useForm<TokenizationFormData>({
     resolver: zodResolver(tokenizationSchema),
     defaultValues: {
@@ -148,8 +150,24 @@ const TokenizationForm: React.FC<TokenizationFormProps> = ({ onSubmit }) => {
         </div>
       </div>
 
-      <button type="submit" className="w-full btn btn-primary text-text">
-        Review & Launch
+      <button 
+        type="submit" 
+        className="w-full btn btn-primary text-text"
+        disabled={isProcessing}
+      >
+        {isProcessing ? (
+          <span className="flex items-center justify-center gap-2">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Loader size={20} />
+            </motion.div>
+            Launching...
+          </span>
+        ) : (
+          'Review & Launch'
+        )}
       </button>
     </form>
   );

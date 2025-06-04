@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX, X } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ShoppingCart, Play, Pause, Volume2, VolumeX, X, ChevronLeft, Users } from 'lucide-react';
 import { CONTENT, CREATORS } from '../data/mockData';
 import PriceChart from '../components/charts/PriceChart';
 import { useAlert } from '../context/AlertContext';
 import { useWallet } from '../context/WalletContext';
 
 const ContentDetailsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { showAlert } = useAlert();
   const { isConnected, connect } = useWallet();
@@ -190,6 +191,14 @@ const ContentDetailsPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border-2 border-text hover:bg-primary-light transition-colors"
+      >
+        <ChevronLeft size={20} />
+        <span>Back</span>
+      </button>
+
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-1 space-y-6">
           {renderContent()}
@@ -260,6 +269,29 @@ const ContentDetailsPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2 className="text-xl font-bold mb-4">Token Holders</h2>
+        <div className="space-y-4">
+          {[1, 2, 3].map((holder) => (
+            <div key={holder} className="flex items-center justify-between p-4 rounded-xl border-2 border-text bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary-light border-2 border-text flex items-center justify-center">
+                  <Users size={20} />
+                </div>
+                <div>
+                  <p className="font-bold">Holder #{holder}</p>
+                  <p className="text-sm opacity-70">0x1234...5678</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold">1,000 Tokens</p>
+                <p className="text-sm opacity-70">10% of supply</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

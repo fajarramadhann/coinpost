@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, CreditCard, Clock, Settings, User, ShoppingBag, Heart, TrendingUp, TrendingDown, Plus, X } from 'lucide-react';
+import { Wallet, CreditCard, Clock, Settings, User, ShoppingBag, Heart, TrendingUp, TrendingDown, Plus, X, Loader, ChevronRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
+import { useAlert } from '../context/AlertContext';
 import MarketCard from '../components/marketplace/MarketCard';
 import { CONTENT } from '../data/mockData';
 
 const ProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const { isConnected, address, balance, connect } = useWallet();
+  const { showAlert } = useAlert();
   const [activeTab, setActiveTab] = useState('collected');
   const [showAddFundsModal, setShowAddFundsModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [fundAmount, setFundAmount] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const tabs = [
     { id: 'collected', label: 'Collected', icon: <ShoppingBag size={18} /> },
@@ -30,25 +35,34 @@ const ProfilePage: React.FC = () => {
   ];
 
   const handleAddFunds = async () => {
-    // Simulate adding funds
+    if (!fundAmount || parseFloat(fundAmount) <= 0) {
+      showAlert('error', 'Please enter a valid amount');
+      return;
+    }
+
+    setIsProcessing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
+      showAlert('success', `Successfully added ${fundAmount} ETH to your wallet`);
       setShowAddFundsModal(false);
       setFundAmount('');
-      // Show success message
     } catch (error) {
-      // Show error message
+      showAlert('error', 'Failed to add funds. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleSaveSettings = async () => {
-    // Simulate saving settings
+    setIsProcessing(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      showAlert('success', 'Settings saved successfully');
       setShowSettingsModal(false);
-      // Show success message
     } catch (error) {
-      // Show error message
+      showAlert('error', 'Failed to save settings. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -180,7 +194,10 @@ const ProfilePage: React.FC = () => {
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Your Content</h2>
-                  <button className="btn btn-primary text-text flex items-center gap-2">
+                  <button 
+                    onClick={() => navigate('/create')}
+                    className="btn btn-primary text-text flex items-center gap-2"
+                  >
                     <Plus size={18} />
                     Create New
                   </button>
@@ -278,11 +295,12 @@ const ProfilePage: React.FC = () => {
       {/* Add Funds Modal */}
       {showAddFundsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-text/20 backdrop-blur-sm" onClick={() => setShowAddFundsModal(false)} />
+          <div className="absolute inset-0 bg-text/20 backdrop-blur-sm" onClick={() => !isProcessing && setShowAddFundsModal(false)} />
           <div className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
             <button
-              onClick={() => setShowAddFundsModal(false)}
+              onClick={() => !isProcessing && setShowAddFundsModal(false)}
               className="absolute top-4 right-4"
+              disabled={isProcessing}
             >
               <X size={24} />
             </button>
@@ -300,6 +318,7 @@ const ProfilePage: React.FC = () => {
                   placeholder="0.00"
                   step="0.01"
                   min="0"
+                  disabled={isProcessing}
                 />
               </div>
 
@@ -309,6 +328,7 @@ const ProfilePage: React.FC = () => {
                     key={amount}
                     onClick={() => setFundAmount(amount.toString())}
                     className="flex-1 p-2 rounded-xl border-2 border-text font-bold hover:bg-primary-light"
+                    disabled={isProcessing}
                   >
                     {amount} ETH
                   </button>
@@ -317,9 +337,22 @@ const ProfilePage: React.FC = () => {
 
               <button
                 onClick={handleAddFunds}
-                className="w-full btn btn-primary text-text"
+                className="w-full btn btn-primary text-text relative"
+                disabled={isProcessing}
               >
-                Add Funds
+                {isProcessing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Loader size={20} />
+                    </motion.div>
+                    Processing...
+                  </span>
+                ) : (
+                  'Add Funds'
+                )}
               </button>
             </div>
           </div>
@@ -329,11 +362,12 @@ const ProfilePage: React.FC = () => {
       {/* Settings Modal */}
       {showSettingsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-text/20 backdrop-blur-sm" onClick={() => setShowSettingsModal(false)} />
+          <div className="absolute inset-0 bg-text/20 backdrop-blur-sm" onClick={() => !isProcessing && setShowSettingsModal(false)} />
           <div className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
             <button
-              onClick={() => setShowSettingsModal(false)}
+              onClick={() => !isProcessing && setShowSettingsModal(false)}
               className="absolute top-4 right-4"
+              disabled={isProcessing}
             >
               <X size={24} />
             </button>
@@ -347,6 +381,7 @@ const ProfilePage: React.FC = () => {
                   type="text"
                   className="input"
                   placeholder="Enter display name"
+                  disabled={isProcessing}
                 />
               </div>
 
@@ -355,6 +390,7 @@ const ProfilePage: React.FC = () => {
                 <textarea
                   className="input min-h-[100px]"
                   placeholder="Tell others about yourself"
+                  disabled={isProcessing}
                 />
               </div>
 
@@ -362,15 +398,27 @@ const ProfilePage: React.FC = () => {
                 <label className="block font-bold mb-2">Email Notifications</label>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded border-2 border-text"
+                      disabled={isProcessing}
+                    />
                     <span>Trading activity</span>
                   </label>
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded border-2 border-text"
+                      disabled={isProcessing}
+                    />
                     <span>New followers</span>
                   </label>
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded border-2 border-text"
+                      disabled={isProcessing}
+                    />
                     <span>Price alerts</span>
                   </label>
                 </div>
@@ -379,8 +427,21 @@ const ProfilePage: React.FC = () => {
               <button
                 onClick={handleSaveSettings}
                 className="w-full btn btn-primary text-text"
+                disabled={isProcessing}
               >
-                Save Changes
+                {isProcessing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Loader size={20} />
+                    </motion.div>
+                    Saving...
+                  </span>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
           </div>
