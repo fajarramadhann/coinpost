@@ -150,7 +150,7 @@ export const CREATORS = [
 // Featured creators (subset)
 export const FEATURED_CREATORS = CREATORS.slice(0, 4);
 
-// Mock content data
+// Mock content data with locked/premium content
 export const CONTENT = [
   {
     id: '101',
@@ -163,7 +163,8 @@ export const CONTENT = [
     comments: 23,
     price: 0.5,
     type: 'nft',
-    isSubscriberOnly: false
+    isSubscriberOnly: false,
+    isLocked: false
   },
   {
     id: '102',
@@ -176,7 +177,8 @@ export const CONTENT = [
     comments: 12,
     price: 0.2,
     type: 'token',
-    isSubscriberOnly: false
+    isSubscriberOnly: false,
+    isLocked: false
   },
   {
     id: '103',
@@ -189,7 +191,8 @@ export const CONTENT = [
     comments: 18,
     price: 0.15,
     type: 'token',
-    isSubscriberOnly: true
+    isSubscriberOnly: true,
+    isLocked: false
   },
   {
     id: '104',
@@ -202,7 +205,8 @@ export const CONTENT = [
     comments: 31,
     price: 0.35,
     type: 'nft',
-    isSubscriberOnly: false
+    isSubscriberOnly: false,
+    isLocked: false
   },
   {
     id: '105',
@@ -215,7 +219,8 @@ export const CONTENT = [
     comments: 15,
     price: 0.18,
     type: 'token',
-    isSubscriberOnly: false
+    isSubscriberOnly: false,
+    isLocked: false
   },
   {
     id: '106',
@@ -228,7 +233,8 @@ export const CONTENT = [
     comments: 27,
     price: 0.25,
     type: 'nft',
-    isSubscriberOnly: true
+    isSubscriberOnly: true,
+    isLocked: false
   },
   {
     id: '107',
@@ -241,7 +247,8 @@ export const CONTENT = [
     comments: 19,
     price: 0.3,
     type: 'nft',
-    isSubscriberOnly: false
+    isSubscriberOnly: false,
+    isLocked: false
   },
   {
     id: '108',
@@ -254,7 +261,8 @@ export const CONTENT = [
     comments: 14,
     price: 0.12,
     type: 'token',
-    isSubscriberOnly: true
+    isSubscriberOnly: true,
+    isLocked: false
   },
   {
     id: '109',
@@ -267,7 +275,8 @@ export const CONTENT = [
     comments: 32,
     price: 0.45,
     type: 'nft',
-    isSubscriberOnly: false
+    isSubscriberOnly: false,
+    isLocked: false
   },
   {
     id: '110',
@@ -280,6 +289,35 @@ export const CONTENT = [
     comments: 25,
     price: 0.22,
     type: 'token',
-    isSubscriberOnly: true
+    isSubscriberOnly: true,
+    isLocked: false
+  },
+  {
+    id: '111',
+    title: 'Premium Trading Strategies',
+    image: 'https://images.pexels.com/photos/7567434/pexels-photo-7567434.jpeg?auto=compress&cs=tinysrgb&w=400',
+    description: 'Exclusive insights into advanced trading strategies and market analysis.',
+    creatorId: '1',
+    createdAt: '2025-04-05T14:20:00Z',
+    likes: 230,
+    comments: 45,
+    price: 1.5,
+    type: 'premium',
+    isSubscriberOnly: true,
+    isLocked: true
+  },
+  {
+    id: '112',
+    title: 'Advanced NFT Creation Guide',
+    image: 'https://images.pexels.com/photos/8370752/pexels-photo-8370752.jpeg?auto=compress&cs=tinysrgb&w=400',
+    description: 'Step-by-step guide to creating and launching successful NFT collections.',
+    creatorId: '2',
+    createdAt: '2025-04-04T09:15:00Z',
+    likes: 189,
+    comments: 37,
+    price: 0.8,
+    type: 'premium',
+    isSubscriberOnly: true,
+    isLocked: true
   }
 ];
