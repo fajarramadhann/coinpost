@@ -96,27 +96,35 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Creators"
-          value="10,000+"
-          icon={<Users size={24} />}
-        />
-        <StatCard
-          title="Content Pieces"
-          value="50,000+"
-          icon={<Gift size={24} />}
-        />
-        <StatCard
-          title="Trading Volume"
-          value="$2M+"
-          icon={<Coins size={24} />}
-        />
-        <StatCard
-          title="Active Users"
-          value="100,000+"
-          icon={<Rocket size={24} />}
-        />
+      <section className="grid grid-cols-2 gap-4">
+        <div className="card p-4 md:p-6">
+          <div className="flex flex-col items-center text-center">
+            <Users className="w-8 h-8 mb-2 text-primary" />
+            <div className="text-2xl md:text-3xl font-bold">10,000+</div>
+            <div className="text-sm">Creators</div>
+          </div>
+        </div>
+        <div className="card p-4 md:p-6">
+          <div className="flex flex-col items-center text-center">
+            <Gift className="w-8 h-8 mb-2 text-secondary" />
+            <div className="text-2xl md:text-3xl font-bold">50,000+</div>
+            <div className="text-sm">Content</div>
+          </div>
+        </div>
+        <div className="card p-4 md:p-6">
+          <div className="flex flex-col items-center text-center">
+            <Coins className="w-8 h-8 mb-2 text-accent" />
+            <div className="text-2xl md:text-3xl font-bold">$2M+</div>
+            <div className="text-sm">Volume</div>
+          </div>
+        </div>
+        <div className="card p-4 md:p-6">
+          <div className="flex flex-col items-center text-center">
+            <Rocket className="w-8 h-8 mb-2 text-success" />
+            <div className="text-2xl md:text-3xl font-bold">100,000+</div>
+            <div className="text-sm">Users</div>
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}
