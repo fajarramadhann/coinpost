@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, ArrowUp, ArrowDown, Wallet, X } from 'lucide-react';
+import { Search, Filter, ScrollText, TrendingUp, MessageCircle, Share2, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { CONTENT, CREATORS } from '../data/mockData';
-import MarketCard from '../components/marketplace/MarketCard';
 import { useWallet } from '../context/WalletContext';
+import { useAlert } from '../context/AlertContext';
 
 const MarketplacePage: React.FC = () => {
   const { isConnected, connect } = useWallet();
+  const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('trending');
+  const [activeFilter, setActiveFilter] = useState('trending');
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1 });
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-
-  const categories = ['All', 'Creator Tokens', 'NFTs', 'Content Tokens'];
-  const types = ['nft', 'token', 'creator_token'];
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const observerRef = useRef<IntersectionObserver>();
+  const loadingRef = useRef<HTMLDivElement>(null);
 
   // Create merged content with creator info
-  const marketItems = CONTENT.map(content => {
+  const feedItems = CONTENT.map(content => {
     const creator = CREATORS.find(c => c.id === content.creatorId);
     return {
       ...content,
@@ -28,275 +28,218 @@ const MarketplacePage: React.FC = () => {
     };
   });
 
-  // Filter and sort
-  const filteredItems = marketItems.filter(item => {
-    if (activeCategory !== 'All') {
-      if (activeCategory === 'NFTs' && item.type !== 'nft') return false;
-      if (activeCategory === 'Content Tokens' && item.type !== 'token') return false;
-      if (activeCategory === 'Creator Tokens' && item.type !== 'creator_token') return false;
-    }
-    
-    if (selectedTypes.length > 0 && !selectedTypes.includes(item.type)) {
-      return false;
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          loadMoreContent();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loadingRef.current) {
+      observerRef.current.observe(loadingRef.current);
     }
 
-    if (item.price < priceRange.min || item.price > priceRange.max) {
-      return false;
-    }
-    
-    if (searchTerm && !item.title.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-    
-    return true;
-  }).sort((a, b) => {
-    if (sortBy === 'trending') return b.likes - a.likes;
-    if (sortBy === 'price_high') return b.price - a.price;
-    if (sortBy === 'price_low') return a.price - b.price;
-    if (sortBy === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    return 0;
-  });
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoading]);
 
-  const handleTypeToggle = (type: string) => {
-    setSelectedTypes(prev => 
-      prev.includes(type) 
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
+  const loadMoreContent = async () => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setPage(prev => prev + 1);
+      if (page >= 3) setHasMore(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleShare = async (item: any) => {
+    try {
+      await navigator.share({
+        title: item.title,
+        text: item.description,
+        url: window.location.href,
+      });
+      showAlert('success', 'Shared successfully');
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        showAlert('error', 'Failed to share');
+      }
+    }
+  };
+
+  const FeedItem = ({ item }: { item: any }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [liked, setLiked] = useState(false);
+    const [likes, setLikes] = useState(item.likes);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl border-2 border-text p-4 space-y-4"
+      >
+        {/* Creator Info */}
+        <div className="flex items-center gap-3">
+          <img
+            src={item.creatorAvatar}
+            alt={item.creatorName}
+            className="w-10 h-10 rounded-full border-2 border-text"
+          />
+          <div>
+            <h3 className="font-bold">{item.creatorName}</h3>
+            <p className="text-sm opacity-70">@{item.creatorUsername}</p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div>
+          <h2 className="text-xl font-bold mb-2">{item.title}</h2>
+          <p className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}>
+            {item.description}
+          </p>
+          {item.description.length > 150 && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-primary font-bold mt-2 flex items-center gap-1"
+            >
+              {isExpanded ? (
+                <>
+                  Show less
+                  <ChevronUp size={16} />
+                </>
+              ) : (
+                <>
+                  Read more
+                  <ChevronDown size={16} />
+                </>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Image */}
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-full rounded-xl border-2 border-text"
+        />
+
+        {/* Actions */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                if (!isConnected) {
+                  showAlert('error', 'Please connect your wallet first');
+                  return;
+                }
+                setLiked(!liked);
+                setLikes(liked ? likes - 1 : likes + 1);
+              }}
+              className="flex items-center gap-2 hover:text-primary transition-colors"
+            >
+              <motion.div
+                whileTap={{ scale: 0.9 }}
+                className={`p-2 rounded-full ${
+                  liked ? 'bg-primary/20' : 'hover:bg-primary/10'
+                }`}
+              >
+                <TrendingUp size={20} className={liked ? 'text-primary' : ''} />
+              </motion.div>
+              <span>{likes}</span>
+            </button>
+            <button className="flex items-center gap-2 hover:text-primary transition-colors">
+              <motion.div
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-full hover:bg-primary/10"
+              >
+                <MessageCircle size={20} />
+              </motion.div>
+              <span>{item.comments}</span>
+            </button>
+            <button
+              onClick={() => handleShare(item)}
+              className="hover:text-primary transition-colors"
+            >
+              <motion.div
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-full hover:bg-primary/10"
+              >
+                <Share2 size={20} />
+              </motion.div>
+            </button>
+          </div>
+          <button className="px-4 py-2 rounded-full bg-primary border-2 border-text font-bold hover:bg-primary-dark transition-colors">
+            {item.price.toFixed(3)} ETH
+          </button>
+        </div>
+      </motion.div>
     );
   };
 
-  if (!isConnected) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-24 h-24 rounded-full bg-primary flex items-center justify-center border-2 border-text shadow-[4px_4px_0px_0px_rgba(16,48,69,1)]"
-        >
-          <Wallet size={32} className="text-text" />
-        </motion.div>
-        <h1 className="text-3xl font-bold text-center">Connect to Trade</h1>
-        <p className="text-center max-w-md">
-          Connect your wallet to start trading tokens and collecting NFTs.
-        </p>
-        <motion.button
-          onClick={connect}
-          className="btn btn-primary text-text"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Connect Wallet
-        </motion.button>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl md:text-3xl font-bold">Marketplace</h1>
-        <button
-          onClick={() => setShowFilters(true)}
-          className="md:hidden btn btn-primary text-text px-3 py-2"
-        >
-          <Filter size={20} />
-        </button>
-      </div>
-
-      {/* Mobile Filters Drawer */}
-      <AnimatePresence>
-        {showFilters && (
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'tween' }}
-            className="fixed inset-0 z-50 bg-background md:hidden"
-          >
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center p-4 border-b border-text">
-                <h2 className="text-xl font-bold">Filters</h2>
-                <button onClick={() => setShowFilters(false)}>
-                  <X size={24} />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-bold">Categories</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => setActiveCategory(category)}
-                        className={`px-4 py-2 rounded-full border-2 border-text font-bold ${
-                          activeCategory === category
-                            ? 'bg-primary'
-                            : 'bg-white'
-                        }`}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-bold">Price Range (ETH)</h3>
-                  <div className="flex gap-4">
-                    <input
-                      type="number"
-                      value={priceRange.min}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseFloat(e.target.value) }))}
-                      className="input"
-                      placeholder="Min"
-                      step="0.01"
-                    />
-                    <input
-                      type="number"
-                      value={priceRange.max}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseFloat(e.target.value) }))}
-                      className="input"
-                      placeholder="Max"
-                      step="0.01"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-bold">Type</h3>
-                  <div className="space-y-2">
-                    {types.map((type) => (
-                      <label key={type} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedTypes.includes(type)}
-                          onChange={() => handleTypeToggle(type)}
-                          className="w-5 h-5 rounded border-2 border-text"
-                        />
-                        <span className="capitalize">{type.replace('_', ' ')}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 border-t border-text">
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="w-full btn btn-primary text-text"
-                >
-                  Apply Filters
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Desktop Filters */}
-        <div className="hidden md:block w-64 space-y-6">
-          <div className="card space-y-4">
-            <h3 className="font-bold">Categories</h3>
-            <div className="flex flex-col gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={`px-4 py-2 rounded-full border-2 border-text font-bold text-left ${
-                    activeCategory === category
-                      ? 'bg-primary'
-                      : 'bg-white hover:bg-primary-light'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="card space-y-4">
-            <h3 className="font-bold">Price Range (ETH)</h3>
-            <div className="space-y-2">
-              <input
-                type="number"
-                value={priceRange.min}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: parseFloat(e.target.value) }))}
-                className="input"
-                placeholder="Min"
-                step="0.01"
-              />
-              <input
-                type="number"
-                value={priceRange.max}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseFloat(e.target.value) }))}
-                className="input"
-                placeholder="Max"
-                step="0.01"
-              />
-            </div>
-          </div>
-
-          <div className="card space-y-4">
-            <h3 className="font-bold">Type</h3>
-            <div className="space-y-2">
-              {types.map((type) => (
-                <label key={type} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedTypes.includes(type)}
-                    onChange={() => handleTypeToggle(type)}
-                    className="w-5 h-5 rounded border-2 border-text"
-                  />
-                  <span className="capitalize">{type.replace('_', ' ')}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Search */}
+      <div className="sticky top-0 z-10 bg-background pt-4 pb-2">
+        <div className="relative">
+          <Search className="absolute top-3 left-3 text-text" size={20} />
+          <input
+            type="text"
+            placeholder="Search posts..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="input pl-10"
+          />
         </div>
 
-        <div className="flex-1 space-y-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-grow">
-              <Search className="absolute top-3 left-3 text-text" size={20} />
-              <input
-                type="text"
-                placeholder="Search marketplace..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input pl-10"
-              />
-            </div>
-            
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="input md:w-48"
+        {/* Filters */}
+        <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+          {['trending', 'latest', 'following', 'popular'].map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={`px-4 py-2 rounded-full border-2 border-text font-bold whitespace-nowrap ${
+                activeFilter === filter
+                  ? 'bg-primary'
+                  : 'bg-white hover:bg-primary-light'
+              }`}
             >
-              <option value="trending">Trending</option>
-              <option value="price_high">Price: High to Low</option>
-              <option value="price_low">Price: Low to High</option>
-              <option value="newest">Newest</option>
-            </select>
-          </div>
-
-          {filteredItems.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {filteredItems.map((item) => (
-                <MarketCard key={item.id} item={item} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <Wallet size={48} className="mx-auto mb-4 text-secondary" />
-              <h3 className="text-2xl font-bold mb-2">No items found</h3>
-              <p className="text-lg">Try adjusting your search or filters</p>
-            </div>
-          )}
+              {filter.charAt(0).toUpperCase() + filter.slice(1)}
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Feed */}
+      <div className="space-y-6">
+        {feedItems.map((item) => (
+          <FeedItem key={item.id} item={item} />
+        ))}
+      </div>
+
+      {/* Loading */}
+      {isLoading && (
+        <div className="flex justify-center py-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <ScrollText size={24} />
+          </motion.div>
+        </div>
+      )}
+
+      {/* Observer Element */}
+      <div ref={loadingRef} className="h-4" />
     </div>
   );
 };
