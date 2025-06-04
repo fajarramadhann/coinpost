@@ -1,54 +1,139 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Image, Video, Music, FileText, AlertCircle } from 'lucide-react';
+import { Upload, Image, Video, Music, FileText, AlertCircle, X } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
+import { useAlert } from '../context/AlertContext';
+import { useFormValidation } from '../hooks/useFormValidation';
+import { validationRules, validateFileType, validateFileSize } from '../utils/validation';
+import { CONTENT_TYPES, MAX_FILE_SIZE, ERROR_MESSAGES } from '../utils/constants';
 
 const CreateContentPage: React.FC = () => {
   const { isConnected, connect } = useWallet();
+  const { showAlert } = useAlert();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [contentType, setContentType] = useState<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [supply, setSupply] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSubscriberOnly, setIsSubscriberOnly] = useState(false);
 
-  const contentTypes = [
-    { id: 'image', label: 'Image', icon: <Image size={24} /> },
-    { id: 'video', label: 'Video', icon: <Video size={24} /> },
-    { id: 'audio', label: 'Audio', icon: <Music size={24} /> },
-    { id: 'text', label: 'Article', icon: <FileText size={24} /> },
-  ];
+  const { values, errors, handleChange, handleSubmit, isSubmitting } = useFormValidation(
+    {
+      title: '',
+      description: '',
+      price: '',
+      supply: ''
+    },
+    validationRules
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
+    const selectedContentType = CONTENT_TYPES.find(type => type.id === contentType);
+    if (!selectedContentType) return;
+
+    // Validate file type
+    if (selectedContentType.allowedTypes && 
+        !validateFileType(selectedFile, selectedContentType.allowedTypes)) {
+      showAlert('error', ERROR_MESSAGES.invalidFileType);
+      return;
+    }
+
+    // Validate file size
+    if (!validateFileSize(selectedFile, MAX_FILE_SIZE)) {
+      showAlert('error', ERROR_MESSAGES.fileTooLarge);
+      return;
+    }
+
     setFile(selectedFile);
     
-    // Create preview URL for images
-    if (contentType === 'image' && selectedFile.type.startsWith('image/')) {
+    // Create preview URL for supported types
+    if (selectedFile.type.startsWith('image/') || 
+        selectedFile.type.startsWith('video/') || 
+        selectedFile.type.startsWith('audio/')) {
       const url = URL.createObjectURL(selectedFile);
       setPreviewUrl(url);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile) {
+      const input = fileInputRef.current;
+      if (input) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(droppedFile);
+        input.files = dataTransfer.files;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+  };
+
+  const handleSubmitContent = async (values: any) => {
     if (!isConnected) {
+      showAlert('error', ERROR_MESSAGES.walletNotConnected);
       connect();
       return;
     }
 
+    if (!file && contentType !== 'text') {
+      showAlert('error', 'Please upload a file');
+      return;
+    }
+
     setIsUploading(true);
-    
-    // Simulate upload and minting
-    setTimeout(() => {
+    try {
+      // Simulate content creation and tokenization
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      showAlert('success', 'Content created and tokenized successfully!');
+      // Reset form
+      setContentType(null);
+      setFile(null);
+      setPreviewUrl(null);
+      setIsSubscriberOnly(false);
+    } catch (error) {
+      showAlert('error', ERROR_MESSAGES.transactionFailed);
+    } finally {
       setIsUploading(false);
-      // Reset form or redirect
-      alert('Content created and tokenized successfully!');
-    }, 2000);
+    }
+  };
+
+  const renderPreview = () => {
+    if (!previewUrl) return null;
+
+    switch (contentType) {
+      case 'image':
+        return (
+          <img 
+            src={previewUrl} 
+            alt="Preview" 
+            className="max-h-64 mx-auto rounded-xl"
+          />
+        );
+      case 'video':
+        return (
+          <video 
+            src={previewUrl} 
+            controls 
+            className="max-h-64 w-full rounded-xl"
+          />
+        );
+      case 'audio':
+        return (
+          <audio 
+            src={previewUrl} 
+            controls 
+            className="w-full mt-4"
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   if (!isConnected) {
@@ -82,26 +167,36 @@ const CreateContentPage: React.FC = () => {
     <div className="max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">Create & Tokenize Content</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(handleSubmitContent);
+      }} className="space-y-8">
         {!contentType ? (
           <div className="card">
             <h2 className="text-xl font-bold mb-6">Choose Content Type</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {contentTypes.map((type) => (
-                <motion.button
-                  key={type.id}
-                  type="button"
-                  onClick={() => setContentType(type.id)}
-                  className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-text bg-white hover:bg-primary-light transition-colors"
-                  whileHover={{ y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mb-3 border-2 border-text">
-                    {type.icon}
-                  </div>
-                  <span className="font-bold">{type.label}</span>
-                </motion.button>
-              ))}
+              {CONTENT_TYPES.map((type) => {
+                const Icon = type.id === 'image' ? Image :
+                           type.id === 'video' ? Video :
+                           type.id === 'audio' ? Music :
+                           FileText;
+                           
+                return (
+                  <motion.button
+                    key={type.id}
+                    type="button"
+                    onClick={() => setContentType(type.id)}
+                    className="flex flex-col items-center justify-center p-6 rounded-xl border-2 border-text bg-white hover:bg-primary-light transition-colors"
+                    whileHover={{ y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mb-3 border-2 border-text">
+                      <Icon size={24} />
+                    </div>
+                    <span className="font-bold">{type.label}</span>
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
         ) : (
@@ -118,10 +213,14 @@ const CreateContentPage: React.FC = () => {
                 </button>
               </div>
 
-              <div className="border-2 border-dashed border-text rounded-xl p-8 text-center">
+              <div 
+                className="border-2 border-dashed border-text rounded-xl p-8 text-center"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={handleDrop}
+              >
                 {previewUrl ? (
                   <div className="relative">
-                    <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto rounded-xl" />
+                    {renderPreview()}
                     <button
                       type="button"
                       onClick={() => {
@@ -130,7 +229,7 @@ const CreateContentPage: React.FC = () => {
                       }}
                       className="absolute top-2 right-2 bg-error text-white p-1 rounded-full"
                     >
-                      <AlertCircle size={16} />
+                      <X size={16} />
                     </button>
                   </div>
                 ) : (
@@ -139,11 +238,13 @@ const CreateContentPage: React.FC = () => {
                       <Upload size={24} className="text-text" />
                     </div>
                     <p>Drag and drop your {contentType} file, or click to browse</p>
-                    <p className="text-sm opacity-70">Max file size: 50MB</p>
+                    <p className="text-sm opacity-70">Max file size: {MAX_FILE_SIZE}MB</p>
                     <input
+                      ref={fileInputRef}
                       type="file"
                       id="content-file"
                       onChange={handleFileChange}
+                      accept={CONTENT_TYPES.find(t => t.id === contentType)?.allowedTypes?.join(',')}
                       className="hidden"
                     />
                     <label
@@ -166,24 +267,30 @@ const CreateContentPage: React.FC = () => {
                   <input
                     type="text"
                     id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="input"
+                    name="title"
+                    value={values.title}
+                    onChange={handleChange}
+                    className={`input ${errors.title ? 'border-error' : ''}`}
                     placeholder="Give your content a title"
-                    required
                   />
+                  {errors.title && (
+                    <p className="text-sm text-error mt-1">{errors.title}</p>
+                  )}
                 </div>
                 
                 <div>
                   <label htmlFor="description" className="block font-bold mb-2">Description</label>
                   <textarea
                     id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="input min-h-[100px]"
+                    name="description"
+                    value={values.description}
+                    onChange={handleChange}
+                    className={`input min-h-[100px] ${errors.description ? 'border-error' : ''}`}
                     placeholder="Describe your content"
-                    required
                   />
+                  {errors.description && (
+                    <p className="text-sm text-error mt-1">{errors.description}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -197,14 +304,17 @@ const CreateContentPage: React.FC = () => {
                   <input
                     type="number"
                     id="price"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    name="price"
+                    value={values.price}
+                    onChange={handleChange}
                     min="0"
                     step="0.001"
-                    className="input"
+                    className={`input ${errors.price ? 'border-error' : ''}`}
                     placeholder="0.05"
-                    required
                   />
+                  {errors.price && (
+                    <p className="text-sm text-error mt-1">{errors.price}</p>
+                  )}
                 </div>
                 
                 <div>
@@ -212,18 +322,26 @@ const CreateContentPage: React.FC = () => {
                   <input
                     type="number"
                     id="supply"
-                    value={supply}
-                    onChange={(e) => setSupply(e.target.value)}
+                    name="supply"
+                    value={values.supply}
+                    onChange={handleChange}
                     min="1"
-                    className="input"
+                    className={`input ${errors.supply ? 'border-error' : ''}`}
                     placeholder="10"
-                    required
                   />
+                  {errors.supply && (
+                    <p className="text-sm text-error mt-1">{errors.supply}</p>
+                  )}
                 </div>
 
                 <div className="md:col-span-2">
                   <label className="flex items-center gap-2">
-                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <input
+                      type="checkbox"
+                      checked={isSubscriberOnly}
+                      onChange={(e) => setIsSubscriberOnly(e.target.checked)}
+                      className="w-5 h-5 rounded border-2 border-text"
+                    />
                     <span>Create subscriber-only content</span>
                   </label>
                 </div>
@@ -233,10 +351,21 @@ const CreateContentPage: React.FC = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                disabled={isUploading}
+                disabled={isUploading || isSubmitting}
                 className="btn btn-primary text-text"
               >
-                {isUploading ? 'Creating...' : 'Create & Tokenize'}
+                {isUploading ? (
+                  <span className="flex items-center">
+                    <motion.div
+                      className="w-5 h-5 border-2 border-text border-t-transparent rounded-full mr-2"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                    Creating...
+                  </span>
+                ) : (
+                  'Create & Tokenize'
+                )}
               </button>
             </div>
           </>
