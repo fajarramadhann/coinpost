@@ -8,6 +8,7 @@ import { motion, LazyMotion, domAnimation } from 'framer-motion';
 const MainLayout: React.FC = () => {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const isLandingPage = location.pathname === '/';
 
   useEffect(() => {
     const handleResize = () => {
@@ -21,7 +22,7 @@ const MainLayout: React.FC = () => {
   return (
     <LazyMotion features={domAnimation}>
       <div className="flex flex-col min-h-screen bg-background">
-        {isMobile ? <MobileNavbar /> : <Navbar />}
+        {isMobile ? (isLandingPage ? null : <MobileNavbar />) : <Navbar />}
         
         <main className="flex-grow main-content">
           <motion.div
@@ -42,4 +43,4 @@ const MainLayout: React.FC = () => {
   );
 };
 
-export default MainLayout
+export default MainLayout;
