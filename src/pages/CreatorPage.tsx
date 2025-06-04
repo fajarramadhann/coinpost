@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sparkles, Users, TrendingUp, DollarSign, CircleEllipsis, Heart, MessageCircle, Share2, ChevronDown, ChevronLeft } from 'lucide-react';
+import { Sparkles, Users, TrendingUp, DollarSign, CircleEllipsis, Heart, MessageCircle, Share2, ChevronDown, ChevronLeft, CreditCard, Settings } from 'lucide-react';
 import ContentCard from '../components/content/ContentCard';
 import PriceChart from '../components/charts/PriceChart';
 import { CREATORS, CONTENT } from '../data/mockData';
@@ -19,15 +19,13 @@ const CreatorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('content');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
+  const [showAddFundsModal, setShowAddFundsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [tokenAmount, setTokenAmount] = useState(1);
 
-  // Find creator by id
   const creator = CREATORS.find(c => c.id === id);
-  
-  // Get content by creator
   const creatorContent = CONTENT.filter(content => content.creatorId === id);
 
-  // Mock price history data
   const priceHistory = Array.from({ length: 30 }, (_, i) => ({
     time: new Date(Date.now() - (30 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     value: creator ? creator.tokenPrice * (1 + Math.sin(i / 5) * 0.2) : 0,
@@ -88,7 +86,6 @@ const CreatorPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border-2 border-text hover:bg-primary-light transition-colors"
@@ -97,7 +94,6 @@ const CreatorPage: React.FC = () => {
         <span>Back</span>
       </button>
 
-      {/* Creator Banner */}
       <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden border-2 border-text shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
         <img
           src={creator.bannerImage}
@@ -106,7 +102,6 @@ const CreatorPage: React.FC = () => {
         />
       </div>
 
-      {/* Creator Info */}
       <div className="relative -mt-16 md:-mt-20 px-4 md:px-8 pb-6">
         <div className="flex flex-col md:flex-row gap-6 md:items-end">
           <img
@@ -128,21 +123,25 @@ const CreatorPage: React.FC = () => {
               </div>
 
               <div className="flex gap-3">
-                <button
-                  onClick={handleSubscribe}
-                  className={`btn ${isSubscribed ? 'bg-secondary' : 'btn-primary'} text-text px-6 py-2`}
+                <motion.button
+                  onClick={() => setShowAddFundsModal(true)}
+                  className="btn btn-primary text-text flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
-                  {isSubscribed ? 'Subscribed' : 'Subscribe'}
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="p-2 rounded-full bg-white border-2 border-text"
+                  <CreditCard size={18} />
+                  Add Funds
+                </motion.button>
+                <motion.button 
+                  onClick={() => setShowSettingsModal(true)}
+                  className="p-2 rounded-full bg-white border-2 border-text hover:shadow-[2px_2px_0px_0px_rgba(16,48,69,1)] hover:-translate-y-0.5 transition-all duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 >
-                  <Share2 size={20} />
-                </button>
-                <button className="p-2 rounded-full bg-white border-2 border-text">
-                  <CircleEllipsis size={20} />
-                </button>
+                  <Settings size={20} />
+                </motion.button>
               </div>
             </div>
 
@@ -164,7 +163,6 @@ const CreatorPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="border-b-2 border-text">
         <div className="flex overflow-x-auto space-x-2">
           {tabs.map((tab) => (
@@ -183,7 +181,6 @@ const CreatorPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tab Content */}
       <div className="min-h-[50vh]">
         {activeTab === 'content' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -212,20 +209,30 @@ const CreatorPage: React.FC = () => {
                 </div>
                 
                 <div className="flex justify-between">
-                  <button
+                  <motion.button
                     onClick={() => setShowTokenModal(true)}
                     className="btn btn-primary text-text w-[48%]"
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { type: "spring", stiffness: 400, damping: 15 }
+                    }}
+                    whileTap={{ scale: 0.95 }}
                     disabled={isProcessing}
                   >
                     Buy
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={() => setShowTokenModal(true)}
                     className="btn btn-secondary text-text w-[48%]"
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { type: "spring", stiffness: 400, damping: 15 }
+                    }}
+                    whileTap={{ scale: 0.95 }}
                     disabled={isProcessing}
                   >
                     Sell
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </div>
@@ -261,7 +268,6 @@ const CreatorPage: React.FC = () => {
         )}
       </div>
 
-      {/* Token Transaction Modal */}
       {showTokenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
