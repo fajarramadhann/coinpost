@@ -31,13 +31,19 @@ const MainLayout: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="container mx-auto px-3 md:px-4 py-4 md:py-8 content-safe-area"
+            className="container mx-auto px-3 md:px-4 content-safe-area"
           >
             <Outlet />
           </motion.div>
         </main>
 
-        {!isMobile && <Footer />}
+        {isLandingPage && (
+          <div className="text-center py-4 text-sm text-text/60">
+            Made by xfajarr
+          </div>
+        )}
+
+        {!isMobile && !isLandingPage && <Footer />}
       </div>
     </LazyMotion>
   );

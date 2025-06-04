@@ -73,8 +73,8 @@ const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
           className="w-full aspect-video object-cover rounded-xl border-2 border-text"
         />
         {content.isSubscriberOnly && (
-          <div className="absolute top-2 right-2 bg-secondary rounded-full p-2 border-2 border-text">
-            <Lock size={16} className="text-text" />
+          <div className="absolute top-2 right-2 bg-secondary rounded-full p-1.5 border-2 border-text">
+            <Lock size={14} className="text-text" />
           </div>
         )}
       </div>
@@ -106,8 +106,8 @@ const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
               <Share2 size={16} />
             </button>
           </div>
-          <div className="font-bold text-sm">
-            ${content.price.toFixed(2)}
+          <div className="text-sm font-bold px-2 py-1 bg-primary/20 rounded-full border border-text">
+            {content.price.toFixed(3)} ETH
           </div>
         </div>
       </div>
