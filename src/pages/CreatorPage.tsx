@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sparkles, Users, TrendingUp, DollarSign, CircleEllipsis, Heart, MessageCircle, Share2, ChevronDown } from 'lucide-react';
+import { Sparkles, Users, TrendingUp, DollarSign, CircleEllipsis, Heart, MessageCircle, Share2, ChevronDown, ChevronLeft } from 'lucide-react';
 import ContentCard from '../components/content/ContentCard';
 import PriceChart from '../components/charts/PriceChart';
 import { CREATORS, CONTENT } from '../data/mockData';
@@ -11,6 +11,7 @@ import { useContentActions } from '../hooks/useContentActions';
 import { useTransaction } from '../hooks/useTransaction';
 
 const CreatorPage: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { isConnected, connect } = useWallet();
   const { showAlert } = useAlert();
@@ -87,6 +88,15 @@ const CreatorPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border-2 border-text hover:bg-primary-light transition-colors"
+      >
+        <ChevronLeft size={20} />
+        <span>Back</span>
+      </button>
+
       {/* Creator Banner */}
       <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden border-2 border-text shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
         <img
