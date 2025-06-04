@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, ScrollText, TrendingUp, MessageCircle, Share2, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, ScrollText, TrendingUp, MessageCircle, Share2, X, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { CONTENT, CREATORS } from '../data/mockData';
 import { useWallet } from '../context/WalletContext';
 import { useAlert } from '../context/AlertContext';
 
 const MarketplacePage: React.FC = () => {
+  const navigate = useNavigate();
   const { isConnected, connect } = useWallet();
   const { showAlert } = useAlert();
   const [searchTerm, setSearchTerm] = useState('');
@@ -81,6 +83,10 @@ const MarketplacePage: React.FC = () => {
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(item.likes);
 
+    const handleContentClick = () => {
+      navigate(`/content/${item.id}`);
+    };
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -101,14 +107,17 @@ const MarketplacePage: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div>
+        <div onClick={handleContentClick} className="cursor-pointer">
           <h2 className="text-xl font-bold mb-2">{item.title}</h2>
           <p className={`text-gray-600 ${isExpanded ? '' : 'line-clamp-3'}`}>
             {item.description}
           </p>
           {item.description.length > 150 && (
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
               className="text-primary font-bold mt-2 flex items-center gap-1"
             >
               {isExpanded ? (
@@ -127,11 +136,23 @@ const MarketplacePage: React.FC = () => {
         </div>
 
         {/* Image */}
-        <img
-          src={item.image}
-          alt={item.title}
-          className="w-full rounded-xl border-2 border-text"
-        />
+        <div className="relative" onClick={handleContentClick}>
+          <img
+            src={item.image}
+            alt={item.title}
+            className={`w-full rounded-xl border-2 border-text ${
+              item.isLocked ? 'filter blur-sm' : ''
+            }`}
+          />
+          {item.isLocked && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white/90 p-4 rounded-xl border-2 border-text flex items-center gap-2">
+                <Lock size={20} />
+                <span className="font-bold">Premium Content</span>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Actions */}
         <div className="flex items-center justify-between pt-2">
@@ -178,7 +199,10 @@ const MarketplacePage: React.FC = () => {
               </motion.div>
             </button>
           </div>
-          <button className="px-4 py-2 rounded-full bg-primary border-2 border-text font-bold hover:bg-primary-dark transition-colors">
+          <button 
+            onClick={handleContentClick}
+            className="px-4 py-2 rounded-full bg-primary border-2 border-text font-bold hover:bg-primary-dark transition-colors"
+          >
             {item.price.toFixed(3)} ETH
           </button>
         </div>
