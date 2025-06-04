@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, CreditCard, Clock, Settings, User, ShoppingBag, Heart, TrendingUp, TrendingDown, Plus } from 'lucide-react';
+import { Wallet, CreditCard, Clock, Settings, User, ShoppingBag, Heart, TrendingUp, TrendingDown, Plus, X } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 import MarketCard from '../components/marketplace/MarketCard';
 import { CONTENT } from '../data/mockData';
@@ -8,6 +8,9 @@ import { CONTENT } from '../data/mockData';
 const ProfilePage: React.FC = () => {
   const { isConnected, address, balance, connect } = useWallet();
   const [activeTab, setActiveTab] = useState('collected');
+  const [showAddFundsModal, setShowAddFundsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [fundAmount, setFundAmount] = useState('');
 
   const tabs = [
     { id: 'collected', label: 'Collected', icon: <ShoppingBag size={18} /> },
@@ -25,6 +28,29 @@ const ProfilePage: React.FC = () => {
     { label: 'Items Owned', value: '28', change: '+3' },
     { label: 'Creators Backed', value: '12', change: '+2' },
   ];
+
+  const handleAddFunds = async () => {
+    // Simulate adding funds
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setShowAddFundsModal(false);
+      setFundAmount('');
+      // Show success message
+    } catch (error) {
+      // Show error message
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    // Simulate saving settings
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setShowSettingsModal(false);
+      // Show success message
+    } catch (error) {
+      // Show error message
+    }
+  };
 
   if (!isConnected) {
     return (
@@ -73,11 +99,17 @@ const ProfilePage: React.FC = () => {
         </div>
         
         <div className="flex gap-3">
-          <button className="btn btn-primary text-text flex items-center gap-2">
+          <button 
+            onClick={() => setShowAddFundsModal(true)}
+            className="btn btn-primary text-text flex items-center gap-2"
+          >
             <CreditCard size={18} />
             Add Funds
           </button>
-          <button className="p-2 rounded-full bg-white border-2 border-text">
+          <button 
+            onClick={() => setShowSettingsModal(true)}
+            className="p-2 rounded-full bg-white border-2 border-text"
+          >
             <Settings size={20} />
           </button>
         </div>
@@ -242,6 +274,118 @@ const ProfilePage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Add Funds Modal */}
+      {showAddFundsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-text/20 backdrop-blur-sm" onClick={() => setShowAddFundsModal(false)} />
+          <div className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
+            <button
+              onClick={() => setShowAddFundsModal(false)}
+              className="absolute top-4 right-4"
+            >
+              <X size={24} />
+            </button>
+
+            <h3 className="text-2xl font-bold mb-6">Add Funds</h3>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block font-bold mb-2">Amount (ETH)</label>
+                <input
+                  type="number"
+                  value={fundAmount}
+                  onChange={(e) => setFundAmount(e.target.value)}
+                  className="input"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                {[0.1, 0.5, 1, 5].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => setFundAmount(amount.toString())}
+                    className="flex-1 p-2 rounded-xl border-2 border-text font-bold hover:bg-primary-light"
+                  >
+                    {amount} ETH
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={handleAddFunds}
+                className="w-full btn btn-primary text-text"
+              >
+                Add Funds
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-text/20 backdrop-blur-sm" onClick={() => setShowSettingsModal(false)} />
+          <div className="relative bg-white rounded-3xl border-2 border-text p-6 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(16,48,69,1)]">
+            <button
+              onClick={() => setShowSettingsModal(false)}
+              className="absolute top-4 right-4"
+            >
+              <X size={24} />
+            </button>
+
+            <h3 className="text-2xl font-bold mb-6">Settings</h3>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block font-bold mb-2">Display Name</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Enter display name"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">Bio</label>
+                <textarea
+                  className="input min-h-[100px]"
+                  placeholder="Tell others about yourself"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-2">Email Notifications</label>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <span>Trading activity</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <span>New followers</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" className="w-5 h-5 rounded border-2 border-text" />
+                    <span>Price alerts</span>
+                  </label>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSaveSettings}
+                className="w-full btn btn-primary text-text"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
